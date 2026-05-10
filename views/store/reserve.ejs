@@ -1,0 +1,75 @@
+<%- include('../partials/head') %>
+  </head>
+  <body class="bg-gray-50">
+    <%- include('../partials/nav') %>
+    <main class="container mx-auto bg-white shadow-lg rounded-lg p-8 mt-10 max-w-3xl">
+      <h2 class="text-3xl text-red-500 font-bold text-center mb-6">
+        Book <%= home.houseName %>
+      </h2>
+
+      <%- include('../partials/errors') %>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <img src="<%= home.photo %>" alt="<%= home.houseName %>" class="w-full h-56 object-cover rounded-lg">
+        <div class="space-y-2">
+          <p class="text-gray-700"><strong>Location:</strong> <%= home.location %></p>
+          <p class="text-gray-700"><strong>Price:</strong> <span class="text-green-600 font-bold">$<%= home.price %></span> / night</p>
+          <p class="text-gray-700"><strong>Rating:</strong> <span class="text-yellow-500">★</span> <%= home.rating %> / 5</p>
+        </div>
+      </div>
+
+      <form action="/bookings/create" method="POST" class="space-y-4">
+        <input type="hidden" name="listingId" value="<%= home._id %>" />
+
+        <div>
+          <label for="checkInDate" class="block text-sm font-medium text-gray-700 mb-1">Check-in Date</label>
+          <input
+            type="date"
+            id="checkInDate"
+            name="checkInDate"
+            value="<%= oldInput.checkInDate %>"
+            required
+            min="<%= new Date().toISOString().split('T')[0] %>"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-400 focus:outline-none"
+          />
+        </div>
+
+        <div>
+          <label for="checkOutDate" class="block text-sm font-medium text-gray-700 mb-1">Check-out Date</label>
+          <input
+            type="date"
+            id="checkOutDate"
+            name="checkOutDate"
+            value="<%= oldInput.checkOutDate %>"
+            required
+            min="<%= new Date().toISOString().split('T')[0] %>"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-400 focus:outline-none"
+          />
+        </div>
+
+        <div class="flex gap-3 pt-2">
+          <a href="/homes/<%= home._id %>" class="px-5 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition">Cancel</a>
+          <button type="submit" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition">
+            Confirm Booking
+          </button>
+        </div>
+      </form>
+    </main>
+
+    <script>
+      // Keep checkout >= checkin + 1 day on the client side as a UX nicety.
+      const checkIn = document.getElementById('checkInDate');
+      const checkOut = document.getElementById('checkOutDate');
+      checkIn.addEventListener('change', () => {
+        if (checkIn.value) {
+          const next = new Date(checkIn.value);
+          next.setDate(next.getDate() + 1);
+          checkOut.min = next.toISOString().split('T')[0];
+          if (checkOut.value && checkOut.value <= checkIn.value) {
+            checkOut.value = checkOut.min;
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,423 @@
+<%- include('../partials/head') %>
+  </head>
+  <body>
+    <%- include('../partials/nav') %>
+    <main class="container mx-auto bg-white shadow-lg rounded-lg p-8 mt-10 max-w-7xl">
+      
+      <!-- Search & Filter Section -->
+      <div class="bg-gray-50 rounded-xl p-6 mb-8 shadow-sm">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          Search & Filter
+        </h3>
+        
+        <form action="/search" method="GET" id="searchForm">
+          <!-- Primary Search Row -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+            <!-- Location -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+              <div class="relative">
+                <input type="text" name="location" id="locationInput"
+                  value="<%= searchParams.location %>"
+                  placeholder="Where are you going?"
+                  class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  autocomplete="off">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute left-3 top-2.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <div id="locationSuggestions" class="absolute z-10 bg-white border rounded-lg shadow-lg mt-1 hidden"></div>
+            </div>
+
+            <!-- Check-in Date -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Check-in</label>
+              <input type="date" name="checkIn" id="checkInDate"
+                value="<%= searchParams.checkIn %>"
+                min="<%= new Date().toISOString().split('T')[0] %>"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+            </div>
+
+            <!-- Check-out Date -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Check-out</label>
+              <input type="date" name="checkOut" id="checkOutDate"
+                value="<%= searchParams.checkOut %>"
+                min="<%= new Date().toISOString().split('T')[0] %>"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+            </div>
+
+            <!-- Guests -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Guests</label>
+              <div class="relative">
+                <input type="number" name="guests" id="guestsInput"
+                  value="<%= searchParams.guests %>"
+                  min="1" max="20" placeholder="Number of guests"
+                  class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute left-3 top-2.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Advanced Filters Toggle -->
+          <button type="button" id="toggleAdvanced" class="text-red-500 hover:text-red-600 font-medium text-sm mb-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+            </svg>
+            <span id="toggleText">Show Advanced Filters</span>
+          </button>
+
+          <!-- Advanced Filters Section -->
+          <div id="advancedFilters" class="hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4 pt-4 border-t border-gray-200">
+              <!-- Price Range -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Price Range (₹)</label>
+                <div class="flex space-x-2">
+                  <input type="number" name="minPrice" 
+                    value="<%= searchParams.minPrice %>"
+                    placeholder="Min" min="0"
+                    class="w-1/2 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                  <input type="number" name="maxPrice"
+                    value="<%= searchParams.maxPrice %>"
+                    placeholder="Max" min="0"
+                    class="w-1/2 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                </div>
+              </div>
+
+              <!-- Property Type -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Property Type</label>
+                <select name="propertyType" 
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                  <option value="all" <%= searchParams.propertyType === '' || searchParams.propertyType === 'all' ? 'selected' : '' %>>All Types</option>
+                  <option value="apartment" <%= searchParams.propertyType === 'apartment' ? 'selected' : '' %>>Apartment</option>
+                  <option value="house" <%= searchParams.propertyType === 'house' ? 'selected' : '' %>>House</option>
+                  <option value="villa" <%= searchParams.propertyType === 'villa' ? 'selected' : '' %>>Villa</option>
+                  <option value="cottage" <%= searchParams.propertyType === 'cottage' ? 'selected' : '' %>>Cottage</option>
+                  <option value="cabin" <%= searchParams.propertyType === 'cabin' ? 'selected' : '' %>>Cabin</option>
+                  <option value="studio" <%= searchParams.propertyType === 'studio' ? 'selected' : '' %>>Studio</option>
+                </select>
+              </div>
+
+              <!-- Bedrooms -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Bedrooms</label>
+                <select name="bedrooms"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                  <option value="" <%= searchParams.bedrooms === '' ? 'selected' : '' %>>Any</option>
+                  <option value="1" <%= searchParams.bedrooms === '1' ? 'selected' : '' %>>1+</option>
+                  <option value="2" <%= searchParams.bedrooms === '2' ? 'selected' : '' %>>2+</option>
+                  <option value="3" <%= searchParams.bedrooms === '3' ? 'selected' : '' %>>3+</option>
+                  <option value="4" <%= searchParams.bedrooms === '4' ? 'selected' : '' %>>4+</option>
+                  <option value="5" <%= searchParams.bedrooms === '5' ? 'selected' : '' %>>5+</option>
+                </select>
+              </div>
+
+              <!-- Bathrooms -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Bathrooms</label>
+                <select name="bathrooms"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                  <option value="" <%= searchParams.bathrooms === '' ? 'selected' : '' %>>Any</option>
+                  <option value="1" <%= searchParams.bathrooms === '1' ? 'selected' : '' %>>1+</option>
+                  <option value="2" <%= searchParams.bathrooms === '2' ? 'selected' : '' %>>2+</option>
+                  <option value="3" <%= searchParams.bathrooms === '3' ? 'selected' : '' %>>3+</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Rating and Amenities Row -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <!-- Minimum Rating -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Minimum Rating</label>
+                <select name="minRating"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                  <option value="" <%= searchParams.minRating === '' ? 'selected' : '' %>>Any Rating</option>
+                  <option value="3" <%= searchParams.minRating === '3' ? 'selected' : '' %>>3+ Stars</option>
+                  <option value="3.5" <%= searchParams.minRating === '3.5' ? 'selected' : '' %>>3.5+ Stars</option>
+                  <option value="4" <%= searchParams.minRating === '4' ? 'selected' : '' %>>4+ Stars</option>
+                  <option value="4.5" <%= searchParams.minRating === '4.5' ? 'selected' : '' %>>4.5+ Stars</option>
+                </select>
+              </div>
+
+              <!-- Sort By -->
+              <div class="flex space-x-2">
+                <div class="flex-1">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
+                  <select name="sortBy"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                    <option value="" <%= searchParams.sortBy === '' ? 'selected' : '' %>>Default (Rating)</option>
+                    <option value="price" <%= searchParams.sortBy === 'price' ? 'selected' : '' %>>Price</option>
+                    <option value="rating" <%= searchParams.sortBy === 'rating' ? 'selected' : '' %>>Rating</option>
+                    <option value="bedrooms" <%= searchParams.sortBy === 'bedrooms' ? 'selected' : '' %>>Bedrooms</option>
+                    <option value="guests" <%= searchParams.sortBy === 'guests' ? 'selected' : '' %>>Guest Capacity</option>
+                  </select>
+                </div>
+                <div class="w-32">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Order</label>
+                  <select name="sortOrder"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                    <option value="asc" <%= searchParams.sortOrder === 'asc' ? 'selected' : '' %>>Low to High</option>
+                    <option value="desc" <%= searchParams.sortOrder === 'desc' ? 'selected' : '' %>>High to Low</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Amenities -->
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Amenities</label>
+              <div class="flex flex-wrap gap-2">
+                <% const amenityList = ['wifi', 'pool', 'parking', 'ac', 'kitchen', 'washer', 'tv', 'workspace']; %>
+                <% const selectedAmenities = searchParams.amenities ? searchParams.amenities.split(',').map(a => a.trim().toLowerCase()) : []; %>
+                <% amenityList.forEach(amenity => { %>
+                  <label class="inline-flex items-center px-3 py-1.5 rounded-full border cursor-pointer transition-colors
+                    <%= selectedAmenities.includes(amenity) ? 'bg-red-100 border-red-500 text-red-700' : 'bg-white border-gray-300 hover:border-red-300' %>">
+                    <input type="checkbox" name="amenityCheck" value="<%= amenity %>" 
+                      <%= selectedAmenities.includes(amenity) ? 'checked' : '' %>
+                      class="hidden">
+                    <span class="capitalize text-sm"><%= amenity %></span>
+                  </label>
+                <% }); %>
+              </div>
+              <input type="hidden" name="amenities" id="amenitiesInput" value="<%= searchParams.amenities %>">
+            </div>
+          </div>
+
+          <!-- Search Buttons -->
+          <div class="flex flex-wrap gap-3">
+            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded-lg transition duration-200 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              Search
+            </button>
+            <a href="/homes" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-6 rounded-lg transition duration-200">
+              Clear Filters
+            </a>
+          </div>
+        </form>
+      </div>
+
+      <!-- Results Header -->
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-3xl text-red-500 font-bold">
+          <% if (typeof resultsCount !== 'undefined' && resultsCount !== null) { %>
+            <%= resultsCount %> <%= resultsCount === 1 ? 'property' : 'properties' %> found
+          <% } else { %>
+            Our Properties
+          <% } %>
+        </h2>
+      </div>
+
+      <!-- Property Grid -->
+      <% if (registeredHomes.length === 0) { %>
+        <div class="text-center py-12">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          <h3 class="text-xl font-semibold text-gray-600 mb-2">No properties found</h3>
+          <p class="text-gray-500">Try adjusting your search filters or <a href="/homes" class="text-red-500 hover:underline">clear all filters</a></p>
+        </div>
+      <% } else { %>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <% registeredHomes.forEach(home => { %>
+            <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition duration-300 border border-gray-100">
+              <div class="relative">
+                <img src="<%= home.photo %>" alt="<%= home.houseName %>" class="w-full h-48 object-cover">
+                <% if (home.propertyType) { %>
+                  <span class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-md text-xs font-medium text-gray-700 capitalize">
+                    <%= home.propertyType %>
+                  </span>
+                <% } %>
+              </div>
+              <div class="p-4">
+                <div class="flex justify-between items-start mb-2">
+                  <h3 class="text-lg font-semibold text-gray-800 line-clamp-1"><%= home.houseName %></h3>
+                  <div class="flex items-center shrink-0 ml-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 text-yellow-400">
+                      <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="text-sm text-gray-700 ml-1"><%= home.rating %></span>
+                  </div>
+                </div>
+                
+                <p class="text-gray-600 text-sm mb-3 flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <%= home.location %>
+                </p>
+                
+                <!-- Property Details -->
+                <div class="flex items-center gap-3 text-sm text-gray-500 mb-3">
+                  <% if (home.maxGuests) { %>
+                    <span class="flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                      </svg>
+                      <%= home.maxGuests %> guests
+                    </span>
+                  <% } %>
+                  <% if (home.bedrooms) { %>
+                    <span class="flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                      </svg>
+                      <%= home.bedrooms %> bed
+                    </span>
+                  <% } %>
+                  <% if (home.bathrooms) { %>
+                    <span class="flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+                      </svg>
+                      <%= home.bathrooms %> bath
+                    </span>
+                  <% } %>
+                </div>
+
+                <div class="flex justify-between items-center pt-3 border-t border-gray-100">
+                  <div>
+                    <span class="text-xl font-bold text-red-500">₹<%= home.price.toLocaleString('en-IN') %></span>
+                    <span class="text-gray-500 text-sm"> / night</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <a href="/homes/<%= home._id %>" class="bg-red-500 hover:bg-red-600 text-white text-sm font-medium py-2 px-4 rounded-lg transition">
+                      View Details
+                    </a>
+                    <%- include('../partials/favourite', {home: home}) %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+    </main>
+
+    <script>
+      // Toggle advanced filters
+      const toggleBtn = document.getElementById('toggleAdvanced');
+      const advancedFilters = document.getElementById('advancedFilters');
+      const toggleText = document.getElementById('toggleText');
+
+      toggleBtn.addEventListener('click', () => {
+        advancedFilters.classList.toggle('hidden');
+        toggleText.textContent = advancedFilters.classList.contains('hidden') 
+          ? 'Show Advanced Filters' 
+          : 'Hide Advanced Filters';
+      });
+
+      // Auto-show advanced filters if any are filled
+      const hasAdvancedFilters = document.querySelector('[name="minPrice"]').value ||
+        document.querySelector('[name="maxPrice"]').value ||
+        document.querySelector('[name="propertyType"]').value !== 'all' ||
+        document.querySelector('[name="bedrooms"]').value ||
+        document.querySelector('[name="bathrooms"]').value ||
+        document.querySelector('[name="minRating"]').value ||
+        document.querySelector('[name="amenities"]').value;
+      
+      if (hasAdvancedFilters) {
+        advancedFilters.classList.remove('hidden');
+        toggleText.textContent = 'Hide Advanced Filters';
+      }
+
+      // Handle amenities checkboxes
+      const amenityCheckboxes = document.querySelectorAll('[name="amenityCheck"]');
+      const amenitiesInput = document.getElementById('amenitiesInput');
+
+      amenityCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+          const checked = Array.from(amenityCheckboxes)
+            .filter(cb => cb.checked)
+            .map(cb => cb.value);
+          amenitiesInput.value = checked.join(',');
+          
+          // Update visual state
+          checkbox.parentElement.classList.toggle('bg-red-100', checkbox.checked);
+          checkbox.parentElement.classList.toggle('border-red-500', checkbox.checked);
+          checkbox.parentElement.classList.toggle('text-red-700', checkbox.checked);
+          checkbox.parentElement.classList.toggle('bg-white', !checkbox.checked);
+          checkbox.parentElement.classList.toggle('border-gray-300', !checkbox.checked);
+        });
+      });
+
+      // Check-in/Check-out date validation
+      const checkInInput = document.getElementById('checkInDate');
+      const checkOutInput = document.getElementById('checkOutDate');
+
+      checkInInput.addEventListener('change', () => {
+        if (checkInInput.value) {
+          // Set minimum check-out date to day after check-in
+          const nextDay = new Date(checkInInput.value);
+          nextDay.setDate(nextDay.getDate() + 1);
+          checkOutInput.min = nextDay.toISOString().split('T')[0];
+          
+          // Clear check-out if it's before check-in
+          if (checkOutInput.value && checkOutInput.value <= checkInInput.value) {
+            checkOutInput.value = '';
+          }
+        }
+      });
+
+      // Location autocomplete (simple implementation)
+      const locationInput = document.getElementById('locationInput');
+      const suggestionsDiv = document.getElementById('locationSuggestions');
+      let debounceTimer;
+
+      locationInput.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        const query = locationInput.value.trim();
+        
+        if (query.length < 2) {
+          suggestionsDiv.classList.add('hidden');
+          return;
+        }
+
+        debounceTimer = setTimeout(async () => {
+          try {
+            const res = await fetch(`/api/locations?q=${encodeURIComponent(query)}`);
+            const data = await res.json();
+            
+            if (data.suggestions && data.suggestions.length > 0) {
+              suggestionsDiv.innerHTML = data.suggestions
+                .map(loc => `<div class="px-4 py-2 hover:bg-gray-100 cursor-pointer">${loc}</div>`)
+                .join('');
+              suggestionsDiv.classList.remove('hidden');
+              
+              // Handle click on suggestion
+              suggestionsDiv.querySelectorAll('div').forEach(div => {
+                div.addEventListener('click', () => {
+                  locationInput.value = div.textContent;
+                  suggestionsDiv.classList.add('hidden');
+                });
+              });
+            } else {
+              suggestionsDiv.classList.add('hidden');
+            }
+          } catch (err) {
+            console.error('Location suggestions error:', err);
+          }
+        }, 300);
+      });
+
+      // Hide suggestions when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!locationInput.contains(e.target) && !suggestionsDiv.contains(e.target)) {
+          suggestionsDiv.classList.add('hidden');
+        }
+      });
+    </script>
+  </body>
+</html>

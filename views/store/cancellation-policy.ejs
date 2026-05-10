@@ -1,0 +1,186 @@
+<%- include('../partials/head') %>
+  </head>
+  <body class="bg-gray-50">
+    <%- include('../partials/nav') %>
+    <main class="container mx-auto p-6 mt-10 max-w-4xl">
+      <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-red-500 to-red-600 p-8 text-white">
+          <h1 class="text-3xl font-bold flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            Cancellation Policy
+          </h1>
+          <p class="text-red-100 mt-2 max-w-2xl">
+            We understand plans can change. Our cancellation policies are designed to be fair to both guests and hosts.
+          </p>
+        </div>
+
+        <!-- Policy Cards -->
+        <div class="p-8">
+          <div class="grid gap-6 md:grid-cols-3">
+            <!-- Flexible Policy -->
+            <div class="border-2 border-green-200 rounded-xl p-6 hover:shadow-lg transition bg-green-50/50">
+              <div class="flex items-center mb-4">
+                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h3 class="text-xl font-bold text-green-700">Flexible</h3>
+              </div>
+              <p class="text-gray-600 mb-4"><%= policies.FLEXIBLE.description %></p>
+              <div class="space-y-2 text-sm">
+                <div class="flex items-start">
+                  <span class="text-green-500 mr-2">✓</span>
+                  <span>Full refund if cancelled <%= policies.FLEXIBLE.fullRefundHours %>+ hours before check-in</span>
+                </div>
+                <div class="flex items-start">
+                  <span class="text-red-500 mr-2">✗</span>
+                  <span>No refund if cancelled less than <%= policies.FLEXIBLE.fullRefundHours %> hours before</span>
+                </div>
+              </div>
+              <div class="mt-4 pt-4 border-t border-green-200">
+                <span class="inline-block bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
+                  Best for Flexibility
+                </span>
+              </div>
+            </div>
+
+            <!-- Moderate Policy -->
+            <div class="border-2 border-yellow-200 rounded-xl p-6 hover:shadow-lg transition bg-yellow-50/50 ring-2 ring-yellow-400 ring-offset-2">
+              <div class="absolute -mt-10 ml-auto">
+                <span class="bg-yellow-500 text-white px-3 py-1 rounded-full text-xs font-bold">DEFAULT</span>
+              </div>
+              <div class="flex items-center mb-4">
+                <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mr-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h3 class="text-xl font-bold text-yellow-700">Moderate</h3>
+              </div>
+              <p class="text-gray-600 mb-4"><%= policies.MODERATE.description %></p>
+              <div class="space-y-2 text-sm">
+                <div class="flex items-start">
+                  <span class="text-green-500 mr-2">✓</span>
+                  <span>Full refund if cancelled <%= policies.MODERATE.fullRefundHours %>+ hours before check-in</span>
+                </div>
+                <div class="flex items-start">
+                  <span class="text-yellow-500 mr-2">◐</span>
+                  <span><%= policies.MODERATE.partialRefundPercent %>% refund if cancelled <%= policies.MODERATE.partialRefundHours %>-<%= policies.MODERATE.fullRefundHours %> hours before</span>
+                </div>
+                <div class="flex items-start">
+                  <span class="text-red-500 mr-2">✗</span>
+                  <span>No refund if cancelled less than <%= policies.MODERATE.partialRefundHours %> hours before</span>
+                </div>
+              </div>
+              <div class="mt-4 pt-4 border-t border-yellow-200">
+                <span class="inline-block bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm font-medium">
+                  Balanced Choice
+                </span>
+              </div>
+            </div>
+
+            <!-- Strict Policy -->
+            <div class="border-2 border-red-200 rounded-xl p-6 hover:shadow-lg transition bg-red-50/50">
+              <div class="flex items-center mb-4">
+                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+                <h3 class="text-xl font-bold text-red-700">Strict</h3>
+              </div>
+              <p class="text-gray-600 mb-4"><%= policies.STRICT.description %></p>
+              <div class="space-y-2 text-sm">
+                <div class="flex items-start">
+                  <span class="text-green-500 mr-2">✓</span>
+                  <span>Full refund if cancelled 7+ days before check-in</span>
+                </div>
+                <div class="flex items-start">
+                  <span class="text-yellow-500 mr-2">◐</span>
+                  <span><%= policies.STRICT.partialRefundPercent %>% refund if cancelled <%= policies.STRICT.partialRefundHours %> hours to 7 days before</span>
+                </div>
+                <div class="flex items-start">
+                  <span class="text-red-500 mr-2">✗</span>
+                  <span>No refund if cancelled less than <%= policies.STRICT.partialRefundHours %> hours before</span>
+                </div>
+              </div>
+              <div class="mt-4 pt-4 border-t border-red-200">
+                <span class="inline-block bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-medium">
+                  Lower Prices
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Additional Info -->
+          <div class="mt-10 space-y-6">
+            <h3 class="text-xl font-bold text-gray-800">Important Information</h3>
+            
+            <div class="grid gap-4 md:grid-cols-2">
+              <div class="bg-blue-50 p-4 rounded-lg">
+                <h4 class="font-semibold text-blue-800 mb-2 flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Refund Processing
+                </h4>
+                <p class="text-sm text-blue-700">
+                  Refunds are typically processed within 5-7 business days. The exact timing depends on your payment method and bank.
+                </p>
+              </div>
+
+              <div class="bg-purple-50 p-4 rounded-lg">
+                <h4 class="font-semibold text-purple-800 mb-2 flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  Check-in Time
+                </h4>
+                <p class="text-sm text-purple-700">
+                  Cancellation timing is calculated based on the check-in date at 12:00 PM (noon) local time.
+                </p>
+              </div>
+
+              <div class="bg-green-50 p-4 rounded-lg">
+                <h4 class="font-semibold text-green-800 mb-2 flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  Confirmation Email
+                </h4>
+                <p class="text-sm text-green-700">
+                  You'll receive an email confirmation when your cancellation is processed, including refund details if applicable.
+                </p>
+              </div>
+
+              <div class="bg-orange-50 p-4 rounded-lg">
+                <h4 class="font-semibold text-orange-800 mb-2 flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  Exceptions
+                </h4>
+                <p class="text-sm text-orange-700">
+                  In case of emergencies or extenuating circumstances, please contact our support team for assistance.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-8 text-center">
+            <a href="/bookings/my" class="inline-flex items-center text-red-500 hover:text-red-600 font-medium">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Back to My Bookings
+            </a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

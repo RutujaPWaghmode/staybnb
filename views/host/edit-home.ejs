@@ -1,0 +1,160 @@
+<%- include('../partials/head') %>
+  </head>
+  <body>
+    <%- include('../partials/nav') %>
+    <main class="container mx-auto mt-8 p-8 bg-white rounded-lg shadow-md max-w-3xl">
+      <h1 class="text-3xl font-bold mb-6 text-center text-gray-800"><%= editing ? "Edit" : "Register"%> Your Home on AirBnB</h1>
+      <form action="/host/<%= editing ? "edit-home" : "add-home"%>" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="id" value="<%= editing ? home._id : ''%>" />
+        
+        <!-- Basic Info Section -->
+        <div class="mb-6">
+          <h3 class="text-lg font-semibold text-gray-700 mb-3 border-b pb-2">Basic Information</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-gray-600 mb-1">House Name *</label>
+              <input
+                type="text"
+                name="houseName"
+                value="<%= editing ? home.houseName : ''%>"
+                placeholder="Enter your House Name"
+                required
+                class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"/>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-600 mb-1">Price Per Night (₹) *</label>
+              <input
+                type="number"
+                name="price"
+                value="<%= editing ? home.price : ''%>"
+                placeholder="Price Per Night"
+                min="0"
+                required
+                class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"/>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-600 mb-1">Rating (0-5) *</label>
+              <input
+                type="number"
+                name="rating"
+                value="<%= editing ? home.rating : ''%>"
+                placeholder="Rating"
+                min="0"
+                max="5"
+                step="0.1"
+                required
+                class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"/>
+            </div>
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-gray-600 mb-1">Location *</label>
+              <input
+                type="text"
+                name="location"
+                value="<%= editing ? home.location : ''%>"
+                placeholder="City, State or Full Address"
+                required
+                class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- Property Details Section -->
+        <div class="mb-6">
+          <h3 class="text-lg font-semibold text-gray-700 mb-3 border-b pb-2">Property Details</h3>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-600 mb-1">Property Type</label>
+              <select name="propertyType" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
+                <option value="apartment" <%= editing && home.propertyType === 'apartment' ? 'selected' : (!editing ? 'selected' : '') %>>Apartment</option>
+                <option value="house" <%= editing && home.propertyType === 'house' ? 'selected' : '' %>>House</option>
+                <option value="villa" <%= editing && home.propertyType === 'villa' ? 'selected' : '' %>>Villa</option>
+                <option value="cottage" <%= editing && home.propertyType === 'cottage' ? 'selected' : '' %>>Cottage</option>
+                <option value="cabin" <%= editing && home.propertyType === 'cabin' ? 'selected' : '' %>>Cabin</option>
+                <option value="studio" <%= editing && home.propertyType === 'studio' ? 'selected' : '' %>>Studio</option>
+                <option value="other" <%= editing && home.propertyType === 'other' ? 'selected' : '' %>>Other</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-600 mb-1">Max Guests</label>
+              <input
+                type="number"
+                name="maxGuests"
+                value="<%= editing && home.maxGuests ? home.maxGuests : '2'%>"
+                min="1"
+                max="50"
+                class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"/>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-600 mb-1">Bedrooms</label>
+              <input
+                type="number"
+                name="bedrooms"
+                value="<%= editing && home.bedrooms ? home.bedrooms : '1'%>"
+                min="0"
+                max="50"
+                class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"/>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-600 mb-1">Bathrooms</label>
+              <input
+                type="number"
+                name="bathrooms"
+                value="<%= editing && home.bathrooms ? home.bathrooms : '1'%>"
+                min="0"
+                max="50"
+                class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- Amenities Section -->
+        <div class="mb-6">
+          <h3 class="text-lg font-semibold text-gray-700 mb-3 border-b pb-2">Amenities</h3>
+          <p class="text-sm text-gray-500 mb-3">Select all amenities available at your property</p>
+          <% const availableAmenities = ['wifi', 'pool', 'parking', 'ac', 'kitchen', 'washer', 'tv', 'workspace', 'gym', 'hot tub', 'fireplace', 'balcony']; %>
+          <% const currentAmenities = editing && home.amenities ? home.amenities.map(a => a.toLowerCase()) : []; %>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <% availableAmenities.forEach(amenity => { %>
+              <label class="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-50 border <%= currentAmenities.includes(amenity) ? 'border-red-500 bg-red-50' : 'border-gray-200' %>">
+                <input type="checkbox" name="amenities" value="<%= amenity %>" 
+                  <%= currentAmenities.includes(amenity) ? 'checked' : '' %>
+                  class="w-4 h-4 text-red-500 border-gray-300 rounded focus:ring-red-500">
+                <span class="capitalize text-sm text-gray-700"><%= amenity %></span>
+              </label>
+            <% }); %>
+          </div>
+        </div>
+
+        <!-- Photo & Description Section -->
+        <div class="mb-6">
+          <h3 class="text-lg font-semibold text-gray-700 mb-3 border-b pb-2">Photo & Description</h3>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-600 mb-1">Property Photo <%= editing ? '(Leave empty to keep current)' : '*' %></label>
+            <% if (editing && home.photo) { %>
+              <div class="mb-2">
+                <img src="/<%= home.photo %>" alt="Current photo" class="w-32 h-24 object-cover rounded-md border">
+                <p class="text-xs text-gray-500 mt-1">Current photo</p>
+              </div>
+            <% } %>
+            <input
+              type="file"
+              name="photo"
+              accept="image/jpg, image/jpeg, image/png"
+              <%= editing ? '' : 'required' %>
+              class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100"/>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-600 mb-1">Description</label>
+            <textarea
+              name="description"
+              placeholder="Describe your home - highlight unique features, nearby attractions, etc."
+              rows="4"
+              class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"><%= editing ? home.description : ''%></textarea>
+          </div>
+        </div>
+
+        <input type="submit" value="<%= editing ? "Update Home" : "Add Home"%>" class="w-full bg-red-500 text-white py-3 rounded-md hover:bg-red-600 transition duration-300 font-semibold cursor-pointer" />
+      </form>
+    </main>
+  </body>
+</html>

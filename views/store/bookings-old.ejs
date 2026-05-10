@@ -1,0 +1,157 @@
+<%- include('../partials/head') %>
+  </head>
+  <body class="bg-gray-50">
+    <%- include('../partials/nav') %>
+    <main class="container mx-auto p-6 mt-10 max-w-5xl">
+      <div class="flex justify-between items-center mb-8">
+        <h2 class="text-4xl font-bold text-red-500">My Bookings</h2>
+        <a href="/bookings/policy" class="text-sm text-gray-500 hover:text-red-500 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Cancellation Policy
+        </a>
+      </div>
+
+      <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6 text-center flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <%= successMessage %>
+        </div>
+      <% } %>
+
+      <% if (typeof cancelled !== 'undefined' && cancelled) { %>
+        <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-6 text-center flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          Booking cancelled successfully. Refund will be processed if applicable.
+        </div>
+      <% } %>
+
+      <% if (!bookings || bookings.length === 0) { %>
+        <div class="bg-white rounded-lg shadow p-10 text-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <p class="text-xl text-gray-600 mb-4">You have no bookings yet.</p>
+          <a href="/homes" class="inline-block bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition">Browse Homes</a>
+        </div>
+      <% } else { %>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <% bookings.forEach(function(b) { %>
+            <% var listing = b.listingId; %>
+            <%
+              // Check if booking can be cancelled
+              var now = new Date();
+              var checkIn = new Date(b.checkInDate);
+              var canCancel = ['confirmed', 'pending'].includes(b.bookingStatus) && now < checkIn;
+            %>
+            <div class="bg-white rounded-xl shadow overflow-hidden hover:shadow-xl transition border border-gray-100">
+              <% if (listing) { %>
+                <div class="relative">
+                  <img src="<%= listing.photo %>" alt="<%= listing.houseName %>" class="w-full h-48 object-cover">
+                  <% if (b.bookingStatus === 'cancelled') { %>
+                    <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
+                      <span class="bg-red-500 text-white px-4 py-2 rounded-lg font-bold">CANCELLED</span>
+                    </div>
+                  <% } %>
+                </div>
+              <% } %>
+              <div class="p-5 space-y-2">
+                <h3 class="text-xl font-bold text-gray-800">
+                  <%= listing ? listing.houseName : 'Listing removed' %>
+                </h3>
+                <% if (listing) { %>
+                  <p class="text-gray-500 text-sm flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    </svg>
+                    <%= listing.location %>
+                  </p>
+                <% } %>
+                <div class="flex justify-between text-sm text-gray-700 pt-2 border-t mt-2">
+                  <div>
+                    <p class="text-xs text-gray-500">Check-in</p>
+                    <p class="font-semibold"><%= b.checkInDate.toDateString() %></p>
+                  </div>
+                  <div>
+                    <p class="text-xs text-gray-500">Check-out</p>
+                    <p class="font-semibold"><%= b.checkOutDate.toDateString() %></p>
+                  </div>
+                </div>
+                <div class="flex justify-between items-center pt-2">
+                  <div class="flex gap-2 flex-wrap">
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold
+                      <%= b.bookingStatus === 'confirmed' ? 'bg-green-100 text-green-700' :
+                         b.bookingStatus === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                         b.bookingStatus === 'cancelled' ? 'bg-red-100 text-red-700' :
+                         'bg-gray-100 text-gray-700' %>">
+                      <%= b.bookingStatus.toUpperCase() %>
+                    </span>
+                    <% if (b.paymentStatus) { %>
+                      <span class="px-2 py-1 rounded-full text-xs
+                        <%= b.paymentStatus === 'completed' ? 'bg-blue-100 text-blue-700' :
+                           b.paymentStatus === 'pending' ? 'bg-orange-100 text-orange-700' :
+                           b.paymentStatus === 'refunded' ? 'bg-purple-100 text-purple-700' :
+                           'bg-gray-100 text-gray-500' %>">
+                        <%= b.paymentStatus === 'completed' ? 'PAID' : 
+                           b.paymentStatus === 'pending' ? 'UNPAID' : 
+                           b.paymentStatus === 'refunded' ? 'REFUNDED' :
+                           b.paymentStatus.toUpperCase() %>
+                      </span>
+                    <% } %>
+                  </div>
+                  <span class="text-green-600 font-bold text-lg">₹<%= b.totalPrice.toLocaleString('en-IN') %></span>
+                </div>
+
+                <% if (b.bookingStatus === 'cancelled' && b.refundAmount > 0) { %>
+                  <div class="bg-purple-50 p-2 rounded text-sm text-purple-700 mt-2">
+                    <span class="font-medium">Refund:</span> ₹<%= b.refundAmount.toLocaleString('en-IN') %>
+                    <% if (b.refundStatus) { %>
+                      (<%= b.refundStatus %>)
+                    <% } %>
+                  </div>
+                <% } %>
+                
+                <div class="pt-3 space-y-2">
+                  <% if (b.paymentStatus === 'pending' && b.bookingStatus !== 'cancelled') { %>
+                    <a href="/payment/<%= b._id %>" class="block text-center bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg transition">
+                      Complete Payment
+                    </a>
+                  <% } %>
+                  
+                  <div class="flex gap-2">
+                    <a href="/bookings/<%= b._id %>" class="flex-1 text-center text-red-500 hover:text-red-600 border border-red-200 py-2 rounded-lg text-sm transition hover:bg-red-50">
+                      View Details
+                    </a>
+                    
+                    <% if (b.paymentStatus === 'completed' && b.bookingStatus !== 'cancelled') { %>
+                      <a href="/invoice/<%= b._id %>" class="flex-1 text-center bg-blue-500 hover:bg-blue-600 text-white py-2 px-3 rounded-lg text-sm transition flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Invoice
+                      </a>
+                    <% } %>
+                    
+                    <% if (canCancel) { %>
+                      <a href="/bookings/<%= b._id %>/cancel" class="flex-1 text-center bg-gray-100 hover:bg-red-100 text-red-600 py-2 px-3 rounded-lg text-sm transition border border-red-200 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        Cancel
+                      </a>
+                    <% } %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+    </main>
+  </body>
+</html>

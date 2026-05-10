@@ -1,0 +1,48 @@
+{
+  "name": "airbnb-clone",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tailwind": "tailwindcss -i ./views/input.css -o ./public/output.css --watch",
+    "tailwind:build": "tailwindcss -i ./views/input.css -o ./public/output.css --minify",
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "keywords": [
+    "airbnb",
+    "nodejs",
+    "express",
+    "mongodb"
+  ],
+  "author": "",
+  "license": "ISC",
+  "description": "Airbnb clone application with Node.js, Express, and MongoDB",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.20",
+    "mongodb-memory-server": "^10.4.3",
+    "nodemon": "^3.1.7",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.13"
+  },
+  "dependencies": {
+    "amqplib": "^1.0.7",
+    "bcryptjs": "^3.0.2",
+    "body-parser": "^1.20.3",
+    "connect-mongodb-session": "^5.0.0",
+    "dotenv": "^17.4.2",
+    "ejs": "^3.1.10",
+    "express": "^4.21.0",
+    "express-session": "^1.19.0",
+    "express-validator": "^7.2.1",
+    "mongodb": "^6.10.0",
+    "mongoose": "^8.12.1",
+    "multer": "^1.4.5-lts.2",
+    "nodemailer": "^8.0.7",
+    "pdfkit": "^0.18.0",
+    "razorpay": "^2.9.6"
+  }
+}

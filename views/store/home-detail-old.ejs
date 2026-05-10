@@ -1,0 +1,185 @@
+<%- include('../partials/head') %>
+  </head>
+  <body>
+      <%- include('../partials/nav') %>
+      <main class="container mx-auto bg-white shadow-lg rounded-lg p-8 mt-10 max-w-6xl">
+          <div class="flex flex-wrap items-center justify-between mb-6">
+            <h2 class="text-3xl text-red-500 font-bold">
+                <%= home.houseName %>
+            </h2>
+            <% if (home.propertyType) { %>
+              <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-medium capitalize">
+                <%= home.propertyType %>
+              </span>
+            <% } %>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div class="rounded-lg overflow-hidden">
+                  <img src="<%= home.photo %>" alt="<%= home.name %>" class="w-full h-96 object-cover rounded-lg">
+              </div>
+              
+              <div class="space-y-6">
+                  <!-- Quick Stats -->
+                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 bg-gray-50 rounded-lg">
+                    <div class="text-center">
+                      <div class="text-2xl font-bold text-red-500"><%= home.maxGuests || 2 %></div>
+                      <div class="text-xs text-gray-500">Guests</div>
+                    </div>
+                    <div class="text-center">
+                      <div class="text-2xl font-bold text-red-500"><%= home.bedrooms || 1 %></div>
+                      <div class="text-xs text-gray-500">Bedrooms</div>
+                    </div>
+                    <div class="text-center">
+                      <div class="text-2xl font-bold text-red-500"><%= home.bathrooms || 1 %></div>
+                      <div class="text-xs text-gray-500">Bathrooms</div>
+                    </div>
+                    <div class="text-center">
+                      <div class="text-2xl font-bold text-yellow-500 flex items-center justify-center">
+                        <span>★</span>
+                        <span class="ml-1"><%= home.rating %></span>
+                      </div>
+                      <div class="text-xs text-gray-500">Rating</div>
+                    </div>
+                  </div>
+
+                  <div class="border-b pb-4">
+                      <h3 class="text-xl font-semibold mb-2">Description</h3>
+                      <p class="text-gray-600"><%= home.description || 'No description available.' %></p>
+                  </div>
+
+                  <div class="border-b pb-4">
+                      <h3 class="text-xl font-semibold mb-2">Location</h3>
+                      <p class="text-gray-600 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <%= home.location %>
+                      </p>
+                  </div>
+
+                  <!-- Amenities -->
+                  <% if (home.amenities && home.amenities.length > 0) { %>
+                  <div class="border-b pb-4">
+                      <h3 class="text-xl font-semibold mb-3">Amenities</h3>
+                      <div class="flex flex-wrap gap-2">
+                        <% const amenityIcons = {
+                          wifi: '📶', pool: '🏊', parking: '🅿️', ac: '❄️', 
+                          kitchen: '🍳', washer: '🧺', tv: '📺', workspace: '💼',
+                          gym: '🏋️', 'hot tub': '🛁', fireplace: '🔥', balcony: '🌅'
+                        }; %>
+                        <% home.amenities.forEach(amenity => { %>
+                          <span class="inline-flex items-center px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-700 capitalize">
+                            <span class="mr-1"><%= amenityIcons[amenity.toLowerCase()] || '✓' %></span>
+                            <%= amenity %>
+                          </span>
+                        <% }); %>
+                      </div>
+                  </div>
+                  <% } %>
+                  
+                  <div class="border-b pb-4">
+                      <h3 class="text-xl font-semibold mb-2">Price</h3>
+                      <p class="text-green-600 text-2xl font-bold">₹<%= home.price.toLocaleString('en-IN') %> <span class="text-gray-500 text-base font-normal">/ night</span></p>
+                  </div>
+                  
+                  <div class="mt-2">
+                    <%- include('../partials/favourite') %>
+                  </div>
+
+                  <%
+                    // Compute availability: a listing is "currently unavailable"
+                    // if at least one confirmed booking covers today's date.
+                    var today = new Date(); today.setHours(0,0,0,0);
+                    var isUnavailableToday = false;
+                    if (typeof upcomingBookings !== 'undefined' && upcomingBookings && upcomingBookings.length > 0) {
+                      isUnavailableToday = upcomingBookings.some(function(b) {
+                        var bIn = new Date(b.checkInDate);
+                        var bOut = new Date(b.checkOutDate);
+                        return bIn <= today && bOut > today;
+                      });
+                    }
+                    var hasUpcoming = (typeof upcomingBookings !== 'undefined' && upcomingBookings) ? upcomingBookings.length > 0 : false;
+                  %>
+
+                  <div class="mt-4 p-4 rounded-lg <%= isUnavailableToday ? 'bg-red-50 border border-red-200' : 'bg-green-50 border border-green-200' %>">
+                    <p class="font-semibold <%= isUnavailableToday ? 'text-red-600' : 'text-green-700' %>">
+                      <%= isUnavailableToday ? 'Currently Unavailable' : 'Available for Booking' %>
+                    </p>
+                    <% if (hasUpcoming) { %>
+                      <p class="text-xs text-gray-600 mt-1">Some dates are already booked. Please pick available dates.</p>
+                    <% } %>
+                  </div>
+
+                  <div class="mt-4">
+                      <!-- Booking Form with Date Picker - visible to all -->
+                      <div class="bg-gray-50 p-4 rounded-lg border">
+                        <h3 class="text-lg font-semibold mb-3 text-gray-800">Book This Property</h3>
+                        
+                        <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+                          <div class="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mb-3 text-sm">
+                            <%= errorMessage %>
+                          </div>
+                        <% } %>
+                        
+                        <form action="/bookings/create" method="POST" class="space-y-3">
+                          <input type="hidden" name="listingId" value="<%= home._id %>" />
+                          
+                          <div>
+                            <label for="checkInDate" class="block text-sm font-medium text-gray-700 mb-1">Check-in Date</label>
+                            <input
+                              type="date"
+                              id="checkInDate"
+                              name="checkInDate"
+                              required
+                              min="<%= new Date().toISOString().split('T')[0] %>"
+                              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-400 focus:outline-none"
+                            />
+                          </div>
+                          
+                          <div>
+                            <label for="checkOutDate" class="block text-sm font-medium text-gray-700 mb-1">Check-out Date</label>
+                            <input
+                              type="date"
+                              id="checkOutDate"
+                              name="checkOutDate"
+                              required
+                              min="<%= new Date().toISOString().split('T')[0] %>"
+                              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-400 focus:outline-none"
+                            />
+                          </div>
+                          
+                          <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-lg transition">
+                            Book Now
+                          </button>
+                          
+                          <% if (!isLoggedIn) { %>
+                            <p class="text-xs text-gray-500 text-center">You will be asked to login before booking</p>
+                          <% } else if (user && user.userType === 'host') { %>
+                            <p class="text-xs text-orange-500 text-center">Note: Hosts cannot book properties</p>
+                          <% } %>
+                        </form>
+                      </div>
+                      
+                      <script>
+                        // Auto-set checkout min date when checkin changes
+                        const checkIn = document.getElementById('checkInDate');
+                        const checkOut = document.getElementById('checkOutDate');
+                        checkIn.addEventListener('change', () => {
+                          if (checkIn.value) {
+                            const next = new Date(checkIn.value);
+                            next.setDate(next.getDate() + 1);
+                            checkOut.min = next.toISOString().split('T')[0];
+                            if (checkOut.value && checkOut.value <= checkIn.value) {
+                              checkOut.value = checkOut.min;
+                            }
+                          }
+                        });
+                      </script>
+                  </div>
+              </div>
+          </div>
+      </main>
+  </body>
+</html>
