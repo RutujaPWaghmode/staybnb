@@ -2,7 +2,7 @@ const Booking = require("../models/booking");
 const Home = require("../models/home");
 const User = require("../models/user");
 const emailService = require("../services/emailService");
-const pricingEngine = require("../services/pricingEngine");
+const pricingEngine = require("../services/simplePricingEngine");
 
 // Helper: parse YYYY-MM-DD string to a Date at midnight UTC.
 // Returns null if invalid.
@@ -109,15 +109,14 @@ exports.postCreateBooking = async (req, res, next) => {
 
     // Compute total price using dynamic pricing engine
     const nights = nightsBetween(checkIn, checkOut);
-    const pricingDetails = await pricingEngine.calculatePrice(
+    const pricingDetails = pricingEngine.calculatePrice(
       home.price,
       checkIn,
-      checkOut,
-      listingId
+      checkOut
     );
     const totalPrice = pricingDetails.totalPrice;
     const originalPrice = pricingDetails.originalTotal;
-    const appliedPricingRules = pricingDetails.appliedRules;
+    const appliedPricingRules = pricingDetails.appliedRules.map(r => r.name);
 
     // Check if payment is enabled
     const paymentEnabled = process.env.PAYMENT_ENABLED === 'true';

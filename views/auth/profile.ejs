@@ -7,11 +7,11 @@
       <div class="max-w-2xl mx-auto">
         <!-- Profile Header -->
         <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-6">
-          <div class="gradient-animated h-24"></div>
+          <div class="bg-rose-500 h-24"></div>
           <div class="px-6 pb-6">
             <div class="flex items-end -mt-12 mb-4">
               <div class="w-24 h-24 rounded-full bg-white p-1 shadow-lg">
-                <div class="w-full h-full rounded-full gradient-animated flex items-center justify-center text-white text-3xl font-bold">
+                <div class="w-full h-full rounded-full bg-gray-700 flex items-center justify-center text-white text-3xl font-bold">
                   <%= user.firstName ? user.firstName.charAt(0).toUpperCase() : (user.email ? user.email.charAt(0).toUpperCase() : 'U') %>
                 </div>
               </div>
@@ -91,7 +91,7 @@
               <p class="text-xs text-gray-400 mt-1">Email cannot be changed</p>
             </div>
             <div class="flex gap-3 pt-2">
-              <button type="submit" class="gradient-animated text-white px-5 py-2 rounded-lg text-sm font-medium hover:shadow-md transition">
+              <button type="submit" class="bg-rose-500 hover:bg-rose-600 text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors">
                 Save Changes
               </button>
               <button type="button" onclick="toggleEditMode()" class="px-5 py-2 rounded-lg text-sm font-medium border border-gray-300 hover:bg-gray-50 transition">
@@ -341,5 +341,7 @@
         });
       }
     </script>
+    
+    <%- include('../partials/footer') %>
   </body>
 </html>

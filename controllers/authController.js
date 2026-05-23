@@ -8,7 +8,7 @@ exports.getLogin = (req, res, next) => {
     currentPage: "login",
     isLoggedIn: false,
     errors: [],
-    oldInput: {email: ""},
+    oldInput: {email: "", loginType: "guest"},
     user: {},
   });
 };
@@ -114,7 +114,7 @@ exports.postSignup = [
 ]
 
 exports.postLogin = async (req, res, next) => {
-  const {email, password} = req.body;
+  const {email, password, loginType} = req.body;
   const user = await User.findOne({email});
   if (!user) {
     return res.status(422).render("auth/login", {
@@ -122,7 +122,7 @@ exports.postLogin = async (req, res, next) => {
       currentPage: "login",
       isLoggedIn: false,
       errors: ["User does not exist"],
-      oldInput: {email},
+      oldInput: {email, loginType},
       user: {},
     });
   }
@@ -134,7 +134,19 @@ exports.postLogin = async (req, res, next) => {
       currentPage: "login",
       isLoggedIn: false,
       errors: ["Invalid Password"],
-      oldInput: {email},
+      oldInput: {email, loginType},
+      user: {},
+    });
+  }
+
+  // Validate login type matches user's account type
+  if (loginType && user.userType !== loginType) {
+    return res.status(422).render("auth/login", {
+      pageTitle: "Login",
+      currentPage: "login",
+      isLoggedIn: false,
+      errors: [`This account is registered as a ${user.userType}. Please select the correct login type.`],
+      oldInput: {email, loginType},
       user: {},
     });
   }
@@ -143,7 +155,12 @@ exports.postLogin = async (req, res, next) => {
   req.session.user = user;
   await req.session.save();
 
-  res.redirect("/");
+  // Redirect hosts to their dashboard, guests to explore page
+  if (user.userType === 'host') {
+    res.redirect("/host/host-home-list");
+  } else {
+    res.redirect("/homes");
+  }
 }
 
 exports.postLogout = (req, res, next) => {

@@ -10,6 +10,11 @@ const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const { default: mongoose } = require('mongoose');
 const multer = require('multer');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
+
+// Environment
+const isProduction = process.env.NODE_ENV === 'production';
 
 // Database configuration
 let DB_PATH = process.env.MONGODB_URI || "mongodb://localhost:27017/airbnb";
@@ -27,9 +32,54 @@ const pricingRouter = require("./routes/pricingRouter")
 const rootDir = require("./utils/pathUtil");
 const errorsController = require("./controllers/errors");
 const emailService = require("./services/emailService");
-const pricingController = require("./controllers/pricingController");
+const pricingController = require("./controllers/simplePricingController");
 
 const app = express();
+
+// Rate Limiting Configuration
+// General rate limiter - 100 requests per 15 minutes
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: {
+    error: 'Too many requests from this IP, please try again after 15 minutes'
+  },
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+
+// Strict rate limiter for auth routes - 10 requests per 15 minutes
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // Limit each IP to 10 requests per windowMs
+  message: {
+    error: 'Too many login/signup attempts, please try again after 15 minutes'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// API rate limiter - 50 requests per minute
+const apiLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 50, // Limit each IP to 50 requests per windowMs
+  message: {
+    error: 'Too many API requests, please try again after a minute'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Booking rate limiter - prevent booking spam
+const bookingLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 20, // Limit each IP to 20 booking attempts per hour
+  message: {
+    error: 'Too many booking attempts, please try again after an hour'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 app.set('view engine', 'ejs');
 app.set('views', 'views');
@@ -100,13 +150,33 @@ async function startServer() {
     console.error('MongoDB Session Store Error:', error);
   });
   
+  // Security middleware for production
+  if (isProduction) {
+    app.set('trust proxy', 1); // Trust first proxy (for HTTPS behind load balancer)
+    app.use(helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          scriptSrc: ["'self'", "'unsafe-inline'", "https://checkout.razorpay.com"],
+          styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+          fontSrc: ["'self'", "https://fonts.gstatic.com"],
+          imgSrc: ["'self'", "data:", "https:"],
+          frameSrc: ["https://api.razorpay.com", "https://checkout.razorpay.com"],
+        },
+      },
+    }));
+  }
+
   app.use(session({
     secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     store,
     cookie: {
-      maxAge: 1000 * 60 * 60 * 24 // 24 hours
+      maxAge: 1000 * 60 * 60 * 24, // 24 hours
+      secure: isProduction, // HTTPS only in production
+      httpOnly: true, // Prevent XSS access to cookie
+      sameSite: 'strict' // CSRF protection
     }
   }));
   
@@ -114,6 +184,20 @@ async function startServer() {
     req.isLoggedIn = req.session.isLoggedIn
     next();
   })
+  
+  // Apply general rate limiter to all routes
+  app.use(generalLimiter);
+  
+  // Apply strict rate limiter to auth routes
+  app.use('/login', authLimiter);
+  app.use('/signup', authLimiter);
+  app.use('/change-password', authLimiter);
+  
+  // Apply API rate limiter to API routes
+  app.use('/api', apiLimiter);
+  
+  // Apply booking rate limiter to booking routes
+  app.use('/bookings', bookingLimiter);
   
   app.use(authRouter)
   app.use("/bookings", bookingRouter);

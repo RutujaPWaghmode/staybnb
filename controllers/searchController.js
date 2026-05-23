@@ -37,15 +37,26 @@ exports.searchHomes = async (req, res, next) => {
 
     // Build MongoDB query
     const query = {};
+    const guestFilter = guests && guests !== '' && !isNaN(parseInt(guests)) && parseInt(guests) > 0 
+      ? parseInt(guests) 
+      : null;
 
     // Location filter (case-insensitive regex search)
+    // Handle variations in spelling and partial matches
     if (location && location.trim()) {
-      query.location = { $regex: location.trim(), $options: "i" };
-    }
-
-    // Guest count filter - only apply if value is provided
-    if (guests && guests !== '' && !isNaN(parseInt(guests))) {
-      query.maxGuests = { $gte: parseInt(guests) };
+      let searchLocation = location.trim()
+        .replace(/,/g, '.*')  // Allow flexible comma matching
+        .replace(/\s+/g, '.*'); // Allow flexible space matching
+      
+      // Handle common misspellings
+      searchLocation = searchLocation
+        .replace(/banglore/gi, 'banga?lore')  // Match both Banglore and Bangalore
+        .replace(/bangalore/gi, 'banga?lore')
+        .replace(/mumbai/gi, '(mumbai|bombay)')
+        .replace(/chennai/gi, '(chennai|madras)')
+        .replace(/kolkata/gi, '(kolkata|calcutta)');
+        
+      query.location = { $regex: searchLocation, $options: "i" };
     }
 
     // Price range filter
@@ -110,6 +121,15 @@ exports.searchHomes = async (req, res, next) => {
 
     // First, get all homes matching the basic criteria
     let homes = await Home.find(query).sort(sortOptions);
+
+    // Filter by guest count (in JavaScript to handle null/undefined maxGuests gracefully)
+    if (guestFilter) {
+      homes = homes.filter((home) => {
+        // If maxGuests is not set, assume it can accommodate any number (default behavior)
+        if (!home.maxGuests) return true;
+        return home.maxGuests >= guestFilter;
+      });
+    }
 
     // If date availability filter is specified, exclude homes with overlapping bookings
     if (checkIn && checkOut) {

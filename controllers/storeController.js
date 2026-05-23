@@ -109,3 +109,12 @@ exports.getHomeDetails = (req, res, next) => {
     }
   });
 };
+
+exports.getPrivacyPolicy = (req, res, next) => {
+  res.render("store/privacy-policy", {
+    pageTitle: "Privacy Policy",
+    currentPage: "privacy",
+    isLoggedIn: req.isLoggedIn,
+    user: req.session.user,
+  });
+};

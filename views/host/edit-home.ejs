@@ -1,160 +1,333 @@
 <%- include('../partials/head') %>
   </head>
-  <body>
+  <body class="bg-gray-50 antialiased">
     <%- include('../partials/nav') %>
-    <main class="container mx-auto mt-8 p-8 bg-white rounded-lg shadow-md max-w-3xl">
-      <h1 class="text-3xl font-bold mb-6 text-center text-gray-800"><%= editing ? "Edit" : "Register"%> Your Home on AirBnB</h1>
-      <form action="/host/<%= editing ? "edit-home" : "add-home"%>" method="POST" enctype="multipart/form-data">
-        <input type="hidden" name="id" value="<%= editing ? home._id : ''%>" />
-        
-        <!-- Basic Info Section -->
-        <div class="mb-6">
-          <h3 class="text-lg font-semibold text-gray-700 mb-3 border-b pb-2">Basic Information</h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="md:col-span-2">
-              <label class="block text-sm font-medium text-gray-600 mb-1">House Name *</label>
-              <input
-                type="text"
-                name="houseName"
-                value="<%= editing ? home.houseName : ''%>"
-                placeholder="Enter your House Name"
-                required
-                class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"/>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-600 mb-1">Price Per Night (₹) *</label>
-              <input
-                type="number"
-                name="price"
-                value="<%= editing ? home.price : ''%>"
-                placeholder="Price Per Night"
-                min="0"
-                required
-                class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"/>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-600 mb-1">Rating (0-5) *</label>
-              <input
-                type="number"
-                name="rating"
-                value="<%= editing ? home.rating : ''%>"
-                placeholder="Rating"
-                min="0"
-                max="5"
-                step="0.1"
-                required
-                class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"/>
-            </div>
-            <div class="md:col-span-2">
-              <label class="block text-sm font-medium text-gray-600 mb-1">Location *</label>
-              <input
-                type="text"
-                name="location"
-                value="<%= editing ? home.location : ''%>"
-                placeholder="City, State or Full Address"
-                required
-                class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"/>
-            </div>
-          </div>
+    
+    <main class="min-h-screen py-10 fade-in">
+      <div class="max-w-3xl mx-auto px-4 sm:px-6">
+        <!-- Breadcrumb -->
+        <nav class="mb-6">
+          <ol class="flex items-center space-x-2 text-sm text-gray-500">
+            <li><a href="/host/host-home-list" class="hover:text-rose-500 transition">Dashboard</a></li>
+            <li><span>/</span></li>
+            <li class="text-gray-900 font-medium"><%= editing ? "Edit Listing" : "Add Listing"%></li>
+          </ol>
+        </nav>
+
+        <!-- Header -->
+        <div class="mb-8">
+          <h1 class="text-3xl font-bold text-gray-900"><%= editing ? "Edit" : "Create New"%> Listing</h1>
+          <p class="text-gray-500 mt-1"><%= editing ? "Update your property details" : "Fill in the details to list your property on StayBnB" %></p>
         </div>
 
-        <!-- Property Details Section -->
-        <div class="mb-6">
-          <h3 class="text-lg font-semibold text-gray-700 mb-3 border-b pb-2">Property Details</h3>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-600 mb-1">Property Type</label>
-              <select name="propertyType" class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500">
-                <option value="apartment" <%= editing && home.propertyType === 'apartment' ? 'selected' : (!editing ? 'selected' : '') %>>Apartment</option>
-                <option value="house" <%= editing && home.propertyType === 'house' ? 'selected' : '' %>>House</option>
-                <option value="villa" <%= editing && home.propertyType === 'villa' ? 'selected' : '' %>>Villa</option>
-                <option value="cottage" <%= editing && home.propertyType === 'cottage' ? 'selected' : '' %>>Cottage</option>
-                <option value="cabin" <%= editing && home.propertyType === 'cabin' ? 'selected' : '' %>>Cabin</option>
-                <option value="studio" <%= editing && home.propertyType === 'studio' ? 'selected' : '' %>>Studio</option>
-                <option value="other" <%= editing && home.propertyType === 'other' ? 'selected' : '' %>>Other</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-600 mb-1">Max Guests</label>
-              <input
-                type="number"
-                name="maxGuests"
-                value="<%= editing && home.maxGuests ? home.maxGuests : '2'%>"
-                min="1"
-                max="50"
-                class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"/>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-600 mb-1">Bedrooms</label>
-              <input
-                type="number"
-                name="bedrooms"
-                value="<%= editing && home.bedrooms ? home.bedrooms : '1'%>"
-                min="0"
-                max="50"
-                class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"/>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-600 mb-1">Bathrooms</label>
-              <input
-                type="number"
-                name="bathrooms"
-                value="<%= editing && home.bathrooms ? home.bathrooms : '1'%>"
-                min="0"
-                max="50"
-                class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"/>
-            </div>
-          </div>
-        </div>
-
-        <!-- Amenities Section -->
-        <div class="mb-6">
-          <h3 class="text-lg font-semibold text-gray-700 mb-3 border-b pb-2">Amenities</h3>
-          <p class="text-sm text-gray-500 mb-3">Select all amenities available at your property</p>
-          <% const availableAmenities = ['wifi', 'pool', 'parking', 'ac', 'kitchen', 'washer', 'tv', 'workspace', 'gym', 'hot tub', 'fireplace', 'balcony']; %>
-          <% const currentAmenities = editing && home.amenities ? home.amenities.map(a => a.toLowerCase()) : []; %>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <% availableAmenities.forEach(amenity => { %>
-              <label class="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-50 border <%= currentAmenities.includes(amenity) ? 'border-red-500 bg-red-50' : 'border-gray-200' %>">
-                <input type="checkbox" name="amenities" value="<%= amenity %>" 
-                  <%= currentAmenities.includes(amenity) ? 'checked' : '' %>
-                  class="w-4 h-4 text-red-500 border-gray-300 rounded focus:ring-red-500">
-                <span class="capitalize text-sm text-gray-700"><%= amenity %></span>
-              </label>
-            <% }); %>
-          </div>
-        </div>
-
-        <!-- Photo & Description Section -->
-        <div class="mb-6">
-          <h3 class="text-lg font-semibold text-gray-700 mb-3 border-b pb-2">Photo & Description</h3>
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-600 mb-1">Property Photo <%= editing ? '(Leave empty to keep current)' : '*' %></label>
-            <% if (editing && home.photo) { %>
-              <div class="mb-2">
-                <img src="/<%= home.photo %>" alt="Current photo" class="w-32 h-24 object-cover rounded-md border">
-                <p class="text-xs text-gray-500 mt-1">Current photo</p>
+        <!-- Form Card -->
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+          <form action="/host/<%= editing ? "edit-home" : "add-home"%>" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="id" value="<%= editing ? home._id : ''%>" />
+            
+            <!-- Basic Info Section -->
+            <div class="p-6 border-b border-gray-100">
+              <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-rose-100 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                </div>
+                <div>
+                  <h2 class="text-lg font-semibold text-gray-900">Basic Information</h2>
+                  <p class="text-sm text-gray-500">Start with the essentials</p>
+                </div>
               </div>
-            <% } %>
-            <input
-              type="file"
-              name="photo"
-              accept="image/jpg, image/jpeg, image/png"
-              <%= editing ? '' : 'required' %>
-              class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100"/>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-600 mb-1">Description</label>
-            <textarea
-              name="description"
-              placeholder="Describe your home - highlight unique features, nearby attractions, etc."
-              rows="4"
-              class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"><%= editing ? home.description : ''%></textarea>
-          </div>
-        </div>
+              
+              <div class="space-y-5">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">Property Name *</label>
+                  <input
+                    type="text"
+                    name="houseName"
+                    value="<%= editing ? home.houseName : ''%>"
+                    placeholder="Give your property a catchy name"
+                    required
+                    class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-rose-500 focus:ring-0 transition text-gray-800 placeholder-gray-400"/>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Price Per Night (₹) *</label>
+                    <div class="relative">
+                      <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium">₹</span>
+                      <input
+                        type="number"
+                        name="price"
+                        value="<%= editing ? home.price : ''%>"
+                        placeholder="2500"
+                        min="100"
+                        required
+                        class="w-full pl-8 pr-4 py-3 rounded-xl border-2 border-gray-200 focus:border-rose-500 focus:ring-0 transition text-gray-800 placeholder-gray-400"/>
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Rating (0-5)</label>
+                    <div class="relative">
+                      <input
+                        type="number"
+                        name="rating"
+                        value="<%= editing ? home.rating : '4.5'%>"
+                        min="0"
+                        max="5"
+                        step="0.1"
+                        class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-rose-500 focus:ring-0 transition text-gray-800"/>
+                      <span class="absolute right-4 top-1/2 -translate-y-1/2 text-amber-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">Location *</label>
+                  <div class="relative">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                      </svg>
+                    </span>
+                    <input
+                      type="text"
+                      name="location"
+                      value="<%= editing ? home.location : ''%>"
+                      placeholder="City, State or Full Address"
+                      required
+                      class="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-200 focus:border-rose-500 focus:ring-0 transition text-gray-800 placeholder-gray-400"/>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-        <input type="submit" value="<%= editing ? "Update Home" : "Add Home"%>" class="w-full bg-red-500 text-white py-3 rounded-md hover:bg-red-600 transition duration-300 font-semibold cursor-pointer" />
-      </form>
+            <!-- Property Details Section -->
+            <div class="p-6 border-b border-gray-100">
+              <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                  </svg>
+                </div>
+                <div>
+                  <h2 class="text-lg font-semibold text-gray-900">Property Details</h2>
+                  <p class="text-sm text-gray-500">Help guests know what to expect</p>
+                </div>
+              </div>
+              
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">Property Type</label>
+                  <select name="propertyType" class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-rose-500 focus:ring-0 transition text-gray-800">
+                    <option value="apartment" <%= editing && home.propertyType === 'apartment' ? 'selected' : (!editing ? 'selected' : '') %>>🏢 Apartment</option>
+                    <option value="house" <%= editing && home.propertyType === 'house' ? 'selected' : '' %>>🏠 House</option>
+                    <option value="villa" <%= editing && home.propertyType === 'villa' ? 'selected' : '' %>>🏡 Villa</option>
+                    <option value="cottage" <%= editing && home.propertyType === 'cottage' ? 'selected' : '' %>>🛖 Cottage</option>
+                    <option value="cabin" <%= editing && home.propertyType === 'cabin' ? 'selected' : '' %>>🏕️ Cabin</option>
+                    <option value="studio" <%= editing && home.propertyType === 'studio' ? 'selected' : '' %>>🏬 Studio</option>
+                    <option value="other" <%= editing && home.propertyType === 'other' ? 'selected' : '' %>>Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">Max Guests</label>
+                  <input
+                    type="number"
+                    name="maxGuests"
+                    value="<%= editing && home.maxGuests ? home.maxGuests : '2'%>"
+                    min="1"
+                    max="50"
+                    class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-rose-500 focus:ring-0 transition text-gray-800"/>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">Bedrooms</label>
+                  <input
+                    type="number"
+                    name="bedrooms"
+                    value="<%= editing && home.bedrooms ? home.bedrooms : '1'%>"
+                    min="0"
+                    max="50"
+                    class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-rose-500 focus:ring-0 transition text-gray-800"/>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">Bathrooms</label>
+                  <input
+                    type="number"
+                    name="bathrooms"
+                    value="<%= editing && home.bathrooms ? home.bathrooms : '1'%>"
+                    min="0"
+                    max="50"
+                    class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-rose-500 focus:ring-0 transition text-gray-800"/>
+                </div>
+              </div>
+            </div>
+
+            <!-- Amenities Section -->
+            <div class="p-6 border-b border-gray-100">
+              <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                </div>
+                <div>
+                  <h2 class="text-lg font-semibold text-gray-900">Amenities</h2>
+                  <p class="text-sm text-gray-500">Select all that apply</p>
+                </div>
+              </div>
+              
+              <% const availableAmenities = [
+                { id: 'wifi', icon: '📶', label: 'WiFi' },
+                { id: 'pool', icon: '🏊', label: 'Pool' },
+                { id: 'parking', icon: '🚗', label: 'Parking' },
+                { id: 'ac', icon: '❄️', label: 'Air Conditioning' },
+                { id: 'kitchen', icon: '🍳', label: 'Kitchen' },
+                { id: 'washer', icon: '🧺', label: 'Washer' },
+                { id: 'tv', icon: '📺', label: 'TV' },
+                { id: 'workspace', icon: '💼', label: 'Workspace' },
+                { id: 'gym', icon: '🏋️', label: 'Gym' },
+                { id: 'hot tub', icon: '🛁', label: 'Hot Tub' },
+                { id: 'fireplace', icon: '🔥', label: 'Fireplace' },
+                { id: 'balcony', icon: '🌅', label: 'Balcony' }
+              ]; %>
+              <% const currentAmenities = editing && home.amenities ? home.amenities.map(a => a.toLowerCase()) : []; %>
+              
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <% availableAmenities.forEach(amenity => { %>
+                  <label class="flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all hover:border-rose-300 <%= currentAmenities.includes(amenity.id) ? 'border-rose-500 bg-rose-50' : 'border-gray-200' %>">
+                    <input type="checkbox" name="amenities" value="<%= amenity.id %>" 
+                      <%= currentAmenities.includes(amenity.id) ? 'checked' : '' %>
+                      class="w-4 h-4 text-rose-500 border-gray-300 rounded focus:ring-rose-500">
+                    <span class="text-lg"><%= amenity.icon %></span>
+                    <span class="text-sm font-medium text-gray-700"><%= amenity.label %></span>
+                  </label>
+                <% }); %>
+              </div>
+            </div>
+
+            <!-- Photo & Description Section -->
+            <div class="p-6">
+              <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                  </svg>
+                </div>
+                <div>
+                  <h2 class="text-lg font-semibold text-gray-900">Photos & Description</h2>
+                  <p class="text-sm text-gray-500">Make your listing stand out</p>
+                </div>
+              </div>
+              
+              <div class="space-y-5">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                    Property Photo <%= editing ? '(Leave empty to keep current)' : '*' %>
+                  </label>
+                  
+                  <% if (editing && home.photo) { %>
+                    <div class="mb-3 flex items-center gap-4">
+                      <img src="/<%= home.photo %>" alt="Current photo" class="w-24 h-24 object-cover rounded-xl border-2 border-gray-200">
+                      <div>
+                        <p class="text-sm font-medium text-gray-700">Current Photo</p>
+                        <p class="text-xs text-gray-500">Upload a new image to replace</p>
+                      </div>
+                    </div>
+                  <% } %>
+                  
+                  <div class="relative">
+                    <input
+                      type="file"
+                      name="photo"
+                      id="photoInput"
+                      accept="image/jpg, image/jpeg, image/png"
+                      <%= editing ? '' : 'required' %>
+                      class="hidden"/>
+                    <label for="photoInput" class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-rose-400 hover:bg-rose-50/50 transition-all">
+                      <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                        </svg>
+                        <p class="mb-2 text-sm text-gray-500"><span class="font-semibold text-rose-500">Click to upload</span> or drag and drop</p>
+                        <p class="text-xs text-gray-400">PNG, JPG up to 10MB</p>
+                      </div>
+                    </label>
+                    <div id="previewContainer" class="hidden mt-3">
+                      <p class="text-sm text-gray-700 font-medium">Selected: <span id="fileName"></span></p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
+                  <textarea
+                    name="description"
+                    placeholder="Describe your property - highlight unique features, nearby attractions, what makes it special..."
+                    rows="5"
+                    class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-rose-500 focus:ring-0 transition text-gray-800 placeholder-gray-400 resize-none"><%= editing ? home.description : ''%></textarea>
+                  <p class="text-xs text-gray-400 mt-1">Write at least 50 characters for better visibility</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100">
+              <div class="flex items-center justify-between">
+                <a href="/host/host-home-list" class="px-6 py-3 text-gray-600 hover:text-gray-800 font-medium transition">
+                  Cancel
+                </a>
+                <button type="submit" class="bg-rose-500 hover:bg-rose-600 text-white px-8 py-3 rounded-xl font-semibold transition-colors flex items-center gap-2">
+                  <% if (editing) { %>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Save Changes
+                  <% } else { %>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    Create Listing
+                  <% } %>
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
     </main>
+
+    <script>
+      // File upload preview
+      const photoInput = document.getElementById('photoInput');
+      const previewContainer = document.getElementById('previewContainer');
+      const fileName = document.getElementById('fileName');
+      
+      photoInput.addEventListener('change', function(e) {
+        if (this.files && this.files[0]) {
+          fileName.textContent = this.files[0].name;
+          previewContainer.classList.remove('hidden');
+        } else {
+          previewContainer.classList.add('hidden');
+        }
+      });
+      
+      // Amenity checkbox visual feedback
+      document.querySelectorAll('input[name="amenities"]').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+          const label = this.closest('label');
+          if (this.checked) {
+            label.classList.add('border-rose-500', 'bg-rose-50');
+            label.classList.remove('border-gray-200');
+          } else {
+            label.classList.remove('border-rose-500', 'bg-rose-50');
+            label.classList.add('border-gray-200');
+          }
+        });
+      });
+    </script>
   </body>
 </html>

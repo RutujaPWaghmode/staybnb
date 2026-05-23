@@ -54,7 +54,8 @@ exports.postAddHome = (req, res, next) => {
     return res.status(422).send("No image provided");
   }
 
-  const photo = req.file.path;
+  // Normalize path to always use forward slashes (cross-platform compatibility)
+  const photo = req.file.path.replace(/\\/g, '/');
 
   // Parse amenities from comma-separated string or checkbox array
   let amenitiesArray = [];
@@ -119,7 +120,8 @@ exports.postEditHome = (req, res, next) => {
             console.log("Error while deleting file ", err);
           }
         });
-        home.photo = req.file.path;
+        // Normalize path to always use forward slashes
+        home.photo = req.file.path.replace(/\\/g, '/');
       }
 
       home

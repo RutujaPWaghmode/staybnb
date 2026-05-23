@@ -5,6 +5,16 @@ const Home = require("../models/home");
 const User = require("../models/user");
 const emailService = require("../services/emailService");
 
+// Check if Razorpay credentials are configured (not placeholder values)
+const isRazorpayConfigured = () => {
+  const keyId = process.env.RAZORPAY_KEY_ID;
+  const keySecret = process.env.RAZORPAY_KEY_SECRET;
+  return keyId && keySecret && 
+         keyId !== 'rzp_test_yourkeyid' && 
+         keySecret !== 'yourkeysecret' &&
+         keyId.startsWith('rzp_');
+};
+
 // Initialize Razorpay instance
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID || "rzp_test_yourkeyid",
@@ -35,6 +45,7 @@ exports.getPaymentPage = async (req, res, next) => {
       booking,
       home: booking.listingId,
       razorpayKeyId: process.env.RAZORPAY_KEY_ID || "rzp_test_yourkeyid",
+      isDemoMode: !isRazorpayConfigured(),
       pageTitle: "Complete Payment",
       currentPage: "bookings",
       isLoggedIn: req.isLoggedIn,
@@ -223,5 +234,63 @@ exports.cancelBooking = async (req, res, next) => {
     res.redirect("/bookings/my");
   } catch (err) {
     next(err);
+  }
+};
+
+// POST /payment/demo - Complete payment in demo mode (no real payment)
+exports.demoPayment = async (req, res, next) => {
+  try {
+    const { bookingId } = req.body;
+    const booking = await Booking.findById(bookingId)
+      .populate("listingId")
+      .populate("userId");
+
+    if (!booking) {
+      return res.status(404).json({ success: false, error: "Booking not found" });
+    }
+
+    // Verify ownership
+    if (booking.userId._id.toString() !== req.session.user._id.toString()) {
+      return res.status(403).json({ success: false, error: "Unauthorized" });
+    }
+
+    // Only allow demo payment for pending bookings
+    if (booking.paymentStatus !== "pending") {
+      return res.status(400).json({ success: false, error: "Booking is not pending payment" });
+    }
+
+    // Mark as paid (demo mode)
+    booking.razorpayPaymentId = `demo_${Date.now()}`;
+    booking.paymentStatus = "completed";
+    booking.bookingStatus = "confirmed";
+    await booking.save();
+
+    // Send confirmation emails
+    try {
+      const user = booking.userId;
+      const listing = booking.listingId;
+      const checkIn = new Date(booking.checkInDate);
+      const checkOut = new Date(booking.checkOutDate);
+      const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+
+      await emailService.queueEmail(emailService.EMAIL_TYPES.BOOKING_CONFIRMATION, {
+        email: user.email,
+        guestName: `${user.firstName} ${user.lastName || ""}`,
+        bookingId: booking._id.toString(),
+        propertyName: listing ? listing.houseName : "Property",
+        location: listing ? listing.location : "N/A",
+        checkIn: checkIn.toDateString(),
+        checkOut: checkOut.toDateString(),
+        nights,
+        totalPrice: booking.totalPrice,
+      });
+    } catch (emailError) {
+      console.error("Demo payment email error:", emailError.message);
+    }
+
+    return res.json({ success: true, message: "Demo payment completed successfully" });
+  } catch (err) {
+    console.error("Demo payment error:", err);
+    res.status(500).json({ success: false, error: "Demo payment failed" });
   }
 };

@@ -1,0 +1,249 @@
+<%- include('../partials/head') %>
+  </head>
+  <body class="bg-gray-50">
+    <%- include('../partials/nav') %>
+    <main class="container mx-auto p-6 mt-10 max-w-4xl">
+      <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-8 text-white">
+          <h1 class="text-3xl font-bold flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            Privacy Policy
+          </h1>
+          <p class="text-blue-100 mt-2 max-w-2xl">
+            Your privacy is important to us. This policy explains how we collect, use, and protect your information.
+          </p>
+          <p class="text-blue-200 text-sm mt-4">Last updated: <%= new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></p>
+        </div>
+
+        <!-- Policy Content -->
+        <div class="p-8 space-y-8">
+          <!-- Information We Collect -->
+          <section>
+            <div class="flex items-center mb-4">
+              <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <h2 class="text-xl font-bold text-gray-800">Information We Collect</h2>
+            </div>
+            <div class="ml-13 space-y-4 text-gray-600">
+              <p>We collect information you provide directly to us, including:</p>
+              <ul class="list-disc ml-6 space-y-2">
+                <li><strong>Account Information:</strong> Name, email address, phone number, and password when you create an account.</li>
+                <li><strong>Profile Information:</strong> Profile photo, bio, and preferences you choose to share.</li>
+                <li><strong>Payment Information:</strong> Credit card details, billing address, and transaction history.</li>
+                <li><strong>Booking Information:</strong> Details about your reservations, including dates, locations, and guest information.</li>
+                <li><strong>Communications:</strong> Messages you send to hosts or guests, and feedback you provide.</li>
+              </ul>
+            </div>
+          </section>
+
+          <!-- How We Use Your Information -->
+          <section>
+            <div class="flex items-center mb-4">
+              <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                </svg>
+              </div>
+              <h2 class="text-xl font-bold text-gray-800">How We Use Your Information</h2>
+            </div>
+            <div class="ml-13 space-y-4 text-gray-600">
+              <p>We use the information we collect to:</p>
+              <ul class="list-disc ml-6 space-y-2">
+                <li>Process bookings and payments</li>
+                <li>Facilitate communication between guests and hosts</li>
+                <li>Send you booking confirmations and updates</li>
+                <li>Provide customer support and respond to inquiries</li>
+                <li>Personalize your experience and show relevant listings</li>
+                <li>Detect and prevent fraud and unauthorized access</li>
+                <li>Comply with legal obligations</li>
+              </ul>
+            </div>
+          </section>
+
+          <!-- Information Sharing -->
+          <section>
+            <div class="flex items-center mb-4">
+              <div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center mr-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <h2 class="text-xl font-bold text-gray-800">Information Sharing</h2>
+            </div>
+            <div class="ml-13 space-y-4 text-gray-600">
+              <p>We may share your information with:</p>
+              <ul class="list-disc ml-6 space-y-2">
+                <li><strong>Hosts and Guests:</strong> To facilitate bookings, we share relevant information between parties.</li>
+                <li><strong>Service Providers:</strong> Third-party vendors who assist with payment processing, email delivery, and analytics.</li>
+                <li><strong>Legal Requirements:</strong> When required by law or to protect rights and safety.</li>
+                <li><strong>Business Transfers:</strong> In connection with a merger, acquisition, or sale of assets.</li>
+              </ul>
+              <p class="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <strong class="text-blue-700">Note:</strong> We never sell your personal information to third parties for marketing purposes.
+              </p>
+            </div>
+          </section>
+
+          <!-- Data Security -->
+          <section>
+            <div class="flex items-center mb-4">
+              <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <h2 class="text-xl font-bold text-gray-800">Data Security</h2>
+            </div>
+            <div class="ml-13 space-y-4 text-gray-600">
+              <p>We implement robust security measures to protect your information:</p>
+              <div class="grid md:grid-cols-2 gap-4 mt-4">
+                <div class="p-4 bg-gray-50 rounded-lg border">
+                  <div class="flex items-center mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <strong>SSL Encryption</strong>
+                  </div>
+                  <p class="text-sm">All data transmitted is encrypted using industry-standard SSL/TLS protocols.</p>
+                </div>
+                <div class="p-4 bg-gray-50 rounded-lg border">
+                  <div class="flex items-center mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <strong>Secure Storage</strong>
+                  </div>
+                  <p class="text-sm">Data is stored in secure, access-controlled data centers.</p>
+                </div>
+                <div class="p-4 bg-gray-50 rounded-lg border">
+                  <div class="flex items-center mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <strong>Regular Audits</strong>
+                  </div>
+                  <p class="text-sm">We conduct regular security audits and vulnerability assessments.</p>
+                </div>
+                <div class="p-4 bg-gray-50 rounded-lg border">
+                  <div class="flex items-center mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <strong>Access Controls</strong>
+                  </div>
+                  <p class="text-sm">Strict access controls limit who can view your information.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Your Rights -->
+          <section>
+            <div class="flex items-center mb-4">
+              <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <h2 class="text-xl font-bold text-gray-800">Your Rights</h2>
+            </div>
+            <div class="ml-13 space-y-4 text-gray-600">
+              <p>You have the following rights regarding your personal data:</p>
+              <div class="space-y-3">
+                <div class="flex items-start">
+                  <span class="text-blue-500 mr-3 mt-1">●</span>
+                  <div>
+                    <strong>Access:</strong> Request a copy of the personal data we hold about you.
+                  </div>
+                </div>
+                <div class="flex items-start">
+                  <span class="text-blue-500 mr-3 mt-1">●</span>
+                  <div>
+                    <strong>Correction:</strong> Request correction of inaccurate or incomplete data.
+                  </div>
+                </div>
+                <div class="flex items-start">
+                  <span class="text-blue-500 mr-3 mt-1">●</span>
+                  <div>
+                    <strong>Deletion:</strong> Request deletion of your personal data in certain circumstances.
+                  </div>
+                </div>
+                <div class="flex items-start">
+                  <span class="text-blue-500 mr-3 mt-1">●</span>
+                  <div>
+                    <strong>Portability:</strong> Request transfer of your data to another service provider.
+                  </div>
+                </div>
+                <div class="flex items-start">
+                  <span class="text-blue-500 mr-3 mt-1">●</span>
+                  <div>
+                    <strong>Opt-out:</strong> Unsubscribe from marketing communications at any time.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Cookies -->
+          <section>
+            <div class="flex items-center mb-4">
+              <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center mr-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h2 class="text-xl font-bold text-gray-800">Cookies & Tracking</h2>
+            </div>
+            <div class="ml-13 space-y-4 text-gray-600">
+              <p>We use cookies and similar technologies to:</p>
+              <ul class="list-disc ml-6 space-y-2">
+                <li>Keep you signed in to your account</li>
+                <li>Remember your preferences and settings</li>
+                <li>Understand how you use our platform</li>
+                <li>Improve our services based on usage patterns</li>
+                <li>Deliver relevant advertisements</li>
+              </ul>
+              <p class="mt-4">You can manage cookie preferences through your browser settings. Note that disabling certain cookies may affect functionality.</p>
+            </div>
+          </section>
+
+          <!-- Contact Us -->
+          <section class="bg-gray-50 rounded-xl p-6 border">
+            <div class="flex items-center mb-4">
+              <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mr-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h2 class="text-xl font-bold text-gray-800">Contact Us</h2>
+            </div>
+            <div class="ml-13 text-gray-600">
+              <p>If you have questions about this Privacy Policy or our data practices, please contact us:</p>
+              <div class="mt-4 space-y-2">
+                <p><strong>Email:</strong> <a href="mailto:privacy@staybnb.com" class="text-blue-600 hover:underline">privacy@staybnb.com</a></p>
+                <p><strong>Address:</strong> StayBnB Privacy Team, 123 Travel Street, San Francisco, CA 94102</p>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- Back Button -->
+        <div class="px-8 pb-8">
+          <a href="/" class="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to Home
+          </a>
+        </div>
+      </div>
+    </main>
+    <%- include('../partials/footer') %>
+  </body>
+</html>

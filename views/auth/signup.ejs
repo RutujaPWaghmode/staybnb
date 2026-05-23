@@ -8,14 +8,14 @@
         <!-- Signup Card -->
         <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
           <!-- Header -->
-          <div class="gradient-animated px-6 py-6 text-white text-center">
-            <div class="w-14 h-14 bg-white/20 rounded-xl mx-auto mb-3 flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7">
+          <div class="px-6 py-6 text-center border-b border-gray-100">
+            <div class="w-14 h-14 bg-rose-50 rounded-xl mx-auto mb-3 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7 text-rose-500">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z"/>
               </svg>
             </div>
-            <h1 class="text-xl font-bold">Join StayBnB</h1>
-            <p class="text-white/80 text-xs mt-1">Create your account and start exploring</p>
+            <h1 class="text-xl font-bold text-gray-900">Create account</h1>
+            <p class="text-gray-500 text-xs mt-1">Join StayBnB and start exploring</p>
           </div>
           
           <!-- Form Section -->
@@ -77,8 +77,25 @@
                     id="password"
                     name="password"
                     placeholder="Minimum 6 characters"
-                    class="w-full pl-10 pr-3 py-2.5 text-sm rounded-lg border border-gray-300 focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition text-gray-800 placeholder-gray-400"
-                    required />
+                    class="w-full pl-10 pr-10 py-2.5 text-sm rounded-lg border border-gray-300 focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition text-gray-800 placeholder-gray-400"
+                    required
+                    minlength="6" />
+                  <button type="button" id="togglePassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition" aria-label="Toggle password visibility">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" id="passwordEyeIcon">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
+                  </button>
+                </div>
+                <!-- Password Strength Indicator -->
+                <div id="passwordStrength" class="mt-2 hidden">
+                  <div class="flex gap-1 mb-1.5">
+                    <div class="h-1 flex-1 rounded-full bg-gray-200" id="strengthBar1"></div>
+                    <div class="h-1 flex-1 rounded-full bg-gray-200" id="strengthBar2"></div>
+                    <div class="h-1 flex-1 rounded-full bg-gray-200" id="strengthBar3"></div>
+                    <div class="h-1 flex-1 rounded-full bg-gray-200" id="strengthBar4"></div>
+                  </div>
+                  <p id="strengthText" class="text-xs text-gray-500"></p>
                 </div>
               </div>
               
@@ -96,9 +113,17 @@
                     id="confirmPassword"
                     name="confirmPassword"
                     placeholder="Repeat your password"
-                    class="w-full pl-10 pr-3 py-2.5 text-sm rounded-lg border border-gray-300 focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition text-gray-800 placeholder-gray-400"
+                    class="w-full pl-10 pr-10 py-2.5 text-sm rounded-lg border border-gray-300 focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition text-gray-800 placeholder-gray-400"
                     required />
+                  <button type="button" id="toggleConfirmPassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition" aria-label="Toggle password visibility">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" id="confirmPasswordEyeIcon">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
+                  </button>
                 </div>
+                <!-- Password Match Indicator -->
+                <p id="passwordMatch" class="mt-1.5 text-xs hidden"></p>
               </div>
               
               <!-- User Type Selection -->
@@ -137,7 +162,7 @@
               </div>
               
               <!-- Submit Button -->
-              <button type="submit" class="w-full gradient-animated text-white py-2.5 rounded-lg font-medium text-sm hover:shadow-md transition-all flex items-center justify-center gap-2">
+              <button type="submit" class="w-full bg-rose-500 hover:bg-rose-600 text-white py-2.5 rounded-lg font-medium text-sm transition-colors flex items-center justify-center gap-2">
                 <span>Create Account</span>
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
@@ -156,6 +181,123 @@
     </main>
     
     <script>
+      // Password visibility toggles
+      function setupPasswordToggle(toggleId, inputId, iconId) {
+        const toggle = document.getElementById(toggleId);
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+        
+        if (toggle && input && icon) {
+          toggle.addEventListener('click', () => {
+            const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+            input.setAttribute('type', type);
+            
+            if (type === 'text') {
+              icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>';
+            } else {
+              icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>';
+            }
+          });
+        }
+      }
+      
+      setupPasswordToggle('togglePassword', 'password', 'passwordEyeIcon');
+      setupPasswordToggle('toggleConfirmPassword', 'confirmPassword', 'confirmPasswordEyeIcon');
+
+      // Password strength checker
+      const passwordInput = document.getElementById('password');
+      const confirmPasswordInput = document.getElementById('confirmPassword');
+      const strengthContainer = document.getElementById('passwordStrength');
+      const strengthText = document.getElementById('strengthText');
+      const bars = [
+        document.getElementById('strengthBar1'),
+        document.getElementById('strengthBar2'),
+        document.getElementById('strengthBar3'),
+        document.getElementById('strengthBar4')
+      ];
+      const passwordMatch = document.getElementById('passwordMatch');
+      
+      function checkPasswordStrength(password) {
+        let strength = 0;
+        const checks = {
+          length: password.length >= 8,
+          lowercase: /[a-z]/.test(password),
+          uppercase: /[A-Z]/.test(password),
+          number: /[0-9]/.test(password),
+          special: /[^A-Za-z0-9]/.test(password)
+        };
+        
+        strength = Object.values(checks).filter(Boolean).length;
+        return { strength, checks };
+      }
+      
+      function updateStrengthUI(strength) {
+        const colors = {
+          0: { bar: '#E5E5E5', text: '', textColor: '' },
+          1: { bar: '#EF4444', text: 'Weak - Add more characters', textColor: 'text-red-500' },
+          2: { bar: '#F59E0B', text: 'Fair - Try adding numbers', textColor: 'text-amber-500' },
+          3: { bar: '#10B981', text: 'Good - Almost there!', textColor: 'text-emerald-500' },
+          4: { bar: '#10B981', text: 'Strong - Great password!', textColor: 'text-emerald-600' },
+          5: { bar: '#059669', text: 'Excellent - Very secure!', textColor: 'text-emerald-700' }
+        };
+        
+        const config = colors[Math.min(strength, 5)];
+        
+        bars.forEach((bar, index) => {
+          if (index < strength) {
+            bar.style.backgroundColor = config.bar;
+          } else {
+            bar.style.backgroundColor = '#E5E5E5';
+          }
+          bar.style.transition = 'background-color 0.3s ease';
+        });
+        
+        strengthText.textContent = config.text;
+        strengthText.className = 'text-xs ' + config.textColor;
+      }
+      
+      passwordInput.addEventListener('input', function() {
+        const password = this.value;
+        
+        if (password.length > 0) {
+          strengthContainer.classList.remove('hidden');
+          const { strength } = checkPasswordStrength(password);
+          updateStrengthUI(strength);
+        } else {
+          strengthContainer.classList.add('hidden');
+        }
+        
+        // Check password match
+        if (confirmPasswordInput.value.length > 0) {
+          checkPasswordMatch();
+        }
+      });
+      
+      function checkPasswordMatch() {
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
+        
+        if (confirmPassword.length > 0) {
+          passwordMatch.classList.remove('hidden');
+          if (password === confirmPassword) {
+            passwordMatch.textContent = '✓ Passwords match';
+            passwordMatch.className = 'mt-1.5 text-xs text-emerald-600';
+            confirmPasswordInput.classList.remove('border-red-300');
+            confirmPasswordInput.classList.add('border-emerald-300');
+          } else {
+            passwordMatch.textContent = '✗ Passwords do not match';
+            passwordMatch.className = 'mt-1.5 text-xs text-red-500';
+            confirmPasswordInput.classList.remove('border-emerald-300');
+            confirmPasswordInput.classList.add('border-red-300');
+          }
+        } else {
+          passwordMatch.classList.add('hidden');
+          confirmPasswordInput.classList.remove('border-red-300', 'border-emerald-300');
+        }
+      }
+      
+      confirmPasswordInput.addEventListener('input', checkPasswordMatch);
+      
       // User type selection - ensure visual feedback works
       document.querySelectorAll('input[name="userType"]').forEach(radio => {
         radio.addEventListener('change', function() {
@@ -189,5 +331,7 @@
         }
       });
     </script>
+    
+    <%- include('../partials/footer') %>
   </body>
 </html>

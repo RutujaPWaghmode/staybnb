@@ -2,64 +2,276 @@
   </head>
   <body class="bg-gray-50">
     <%- include('../partials/nav') %>
-    <main class="container mx-auto bg-white shadow-lg rounded-lg p-8 mt-10 max-w-3xl">
-      <h2 class="text-3xl text-red-500 font-bold text-center mb-6">
-        Book <%= home.houseName %>
-      </h2>
-
-      <%- include('../partials/errors') %>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <img src="<%= home.photo %>" alt="<%= home.houseName %>" class="w-full h-56 object-cover rounded-lg">
-        <div class="space-y-2">
-          <p class="text-gray-700"><strong>Location:</strong> <%= home.location %></p>
-          <p class="text-gray-700"><strong>Price:</strong> <span class="text-green-600 font-bold">$<%= home.price %></span> / night</p>
-          <p class="text-gray-700"><strong>Rating:</strong> <span class="text-yellow-500">★</span> <%= home.rating %> / 5</p>
-        </div>
-      </div>
-
-      <form action="/bookings/create" method="POST" class="space-y-4">
-        <input type="hidden" name="listingId" value="<%= home._id %>" />
-
-        <div>
-          <label for="checkInDate" class="block text-sm font-medium text-gray-700 mb-1">Check-in Date</label>
-          <input
-            type="date"
-            id="checkInDate"
-            name="checkInDate"
-            value="<%= oldInput.checkInDate %>"
-            required
-            min="<%= new Date().toISOString().split('T')[0] %>"
-            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-400 focus:outline-none"
-          />
-        </div>
-
-        <div>
-          <label for="checkOutDate" class="block text-sm font-medium text-gray-700 mb-1">Check-out Date</label>
-          <input
-            type="date"
-            id="checkOutDate"
-            name="checkOutDate"
-            value="<%= oldInput.checkOutDate %>"
-            required
-            min="<%= new Date().toISOString().split('T')[0] %>"
-            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-red-400 focus:outline-none"
-          />
-        </div>
-
-        <div class="flex gap-3 pt-2">
-          <a href="/homes/<%= home._id %>" class="px-5 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition">Cancel</a>
-          <button type="submit" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-lg transition">
-            Confirm Booking
+    
+    <!-- Dynamic Pricing Toast Notification -->
+    <div id="pricingToast" class="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 hidden max-w-md w-full mx-4 transition-all duration-300 ease-out opacity-0 translate-y-[-20px]">
+      <!-- Higher Price Toast -->
+      <div id="toastHigher" class="hidden bg-amber-500 text-white px-6 py-4 rounded-xl shadow-lg">
+        <div class="flex items-center gap-3">
+          <div class="flex-shrink-0">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+            </svg>
+          </div>
+          <div class="flex-1">
+            <p class="font-semibold">Peak Season Rates</p>
+            <p id="toastHigherText" class="text-sm opacity-90">Prices are higher for selected dates</p>
+          </div>
+          <button onclick="hideToast()" class="text-white/80 hover:text-white">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+            </svg>
           </button>
         </div>
-      </form>
+      </div>
+      
+      <!-- Lower Price Toast (Discount) -->
+      <div id="toastLower" class="hidden bg-green-500 text-white px-6 py-4 rounded-xl shadow-lg">
+        <div class="flex items-center gap-3">
+          <div class="flex-shrink-0">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+            </svg>
+          </div>
+          <div class="flex-1">
+            <p class="font-semibold">🎉 Great News!</p>
+            <p id="toastLowerText" class="text-sm opacity-90">You're getting a discount</p>
+          </div>
+          <button onclick="hideToast()" class="text-white/80 hover:text-white">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <main class="max-w-4xl mx-auto px-4 py-6 sm:py-8 lg:py-10 fade-in">
+      <!-- Breadcrumb -->
+      <nav class="mb-4 sm:mb-6 overflow-x-auto">
+        <ol class="flex items-center space-x-2 text-xs sm:text-sm text-gray-500 whitespace-nowrap">
+          <li><a href="/" class="hover:text-rose-500 transition">Home</a></li>
+          <li><span>/</span></li>
+          <li><a href="/homes/<%= home._id %>" class="hover:text-rose-500 transition truncate max-w-[100px] sm:max-w-none"><%= home.houseName %></a></li>
+          <li><span>/</span></li>
+          <li class="text-gray-900 font-medium">Reserve</li>
+        </ol>
+      </nav>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8">
+        <!-- Main Form -->
+        <div class="lg:col-span-3 order-2 lg:order-1">
+          <h1 class="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Confirm your booking</h1>
+          
+          <%- include('../partials/errors') %>
+          
+          <form action="/bookings/create" method="POST" class="space-y-6" data-loading>
+            <input type="hidden" name="listingId" value="<%= home._id %>" />
+            
+            <!-- Dates Section -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                Your trip
+              </h2>
+              
+              <div class="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label for="checkInDate" class="block text-sm font-medium text-gray-700 mb-2">Check-in</label>
+                  <input
+                    type="date"
+                    id="checkInDate"
+                    name="checkInDate"
+                    value="<%= oldInput.checkInDate %>"
+                    required
+                    min="<%= new Date().toISOString().split('T')[0] %>"
+                    class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-rose-500 focus:border-transparent transition"
+                  />
+                </div>
+                
+                <div>
+                  <label for="checkOutDate" class="block text-sm font-medium text-gray-700 mb-2">Check-out</label>
+                  <input
+                    type="date"
+                    id="checkOutDate"
+                    name="checkOutDate"
+                    value="<%= oldInput.checkOutDate %>"
+                    required
+                    min="<%= new Date().toISOString().split('T')[0] %>"
+                    class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-rose-500 focus:border-transparent transition"
+                  />
+                </div>
+              </div>
+              
+              <p class="text-sm text-gray-500 mt-3 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Free cancellation for 48 hours
+              </p>
+            </div>
+            
+            <!-- Guests Section -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                Guests
+              </h2>
+              
+              <div class="flex items-center justify-between py-3">
+                <span class="text-gray-700">Number of guests</span>
+                <div class="flex items-center gap-3">
+                  <button type="button" id="guestMinus" class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-gray-400 transition disabled:opacity-40" disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                    </svg>
+                  </button>
+                  <span id="guestCount" class="w-8 text-center font-medium text-gray-900">1</span>
+                  <input type="hidden" name="guests" id="guestsInput" value="1">
+                  <button type="button" id="guestPlus" class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-gray-600 hover:border-gray-400 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <p class="text-xs text-gray-400">Maximum <%= home.maxGuests || 4 %> guests allowed</p>
+            </div>
+            
+            <!-- Actions -->
+            <div class="flex gap-4">
+              <a href="/homes/<%= home._id %>" class="px-6 py-3 rounded-xl border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition">
+                Back
+              </a>
+              <button type="submit" class="flex-1 bg-rose-500 hover:bg-rose-600 text-white font-semibold py-3 px-6 rounded-xl transition-colors flex items-center justify-center gap-2">
+                Confirm and pay
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                </svg>
+              </button>
+            </div>
+          </form>
+        </div>
+        
+        <!-- Booking Summary Card -->
+        <div class="lg:col-span-2">
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 sticky top-24 overflow-hidden">
+            <!-- Property Image -->
+            <div class="relative h-48">
+              <% if (home.photo) { %>
+                <img src="/<%= home.photo %>" alt="<%= home.houseName %>" class="w-full h-full object-cover"
+                     onerror="this.onerror=null; this.src='/images/house1.png';">
+              <% } else { %>
+                <img src="/images/house1.png" alt="<%= home.houseName %>" class="w-full h-full object-cover">
+              <% } %>
+              <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+              <div class="absolute bottom-4 left-4 text-white">
+                <p class="font-medium"><%= home.houseName %></p>
+                <p class="text-sm opacity-90"><%= home.location %></p>
+              </div>
+            </div>
+            
+            <!-- Price Details -->
+            <div class="p-5">
+              <h3 class="font-semibold text-gray-900 mb-4">Price details</h3>
+              
+              <!-- Dynamic Pricing Alert - HIGHER PRICE -->
+              <div id="higherPriceAlert" class="hidden mb-4 p-3 bg-amber-50 rounded-xl border border-amber-200">
+                <div class="flex items-start gap-3">
+                  <div class="flex-shrink-0 w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
+                    <svg class="w-5 h-5 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clip-rule="evenodd"/>
+                    </svg>
+                  </div>
+                  <div class="flex-1">
+                    <p class="font-semibold text-amber-800 text-sm">Peak Season Pricing</p>
+                    <p id="higherPriceReason" class="text-xs text-amber-700 mt-0.5">Higher rates apply for selected dates</p>
+                    <div class="mt-2 flex items-center gap-2">
+                      <span class="text-xs text-amber-600 line-through" id="originalPriceHigher">₹0</span>
+                      <span class="text-sm font-bold text-amber-800">→</span>
+                      <span class="text-sm font-bold text-amber-800" id="newPriceHigher">₹0</span>
+                      <span class="text-xs text-amber-600" id="percentHigher">(+0%)</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Dynamic Pricing Alert - LOWER PRICE (Discount) -->
+              <div id="lowerPriceAlert" class="hidden mb-4 p-3 bg-green-50 rounded-xl border border-green-200">
+                <div class="flex items-start gap-3">
+                  <div class="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                    <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                  </div>
+                  <div class="flex-1">
+                    <p class="font-semibold text-green-800 text-sm">🎉 You're saving money!</p>
+                    <p id="lowerPriceReason" class="text-xs text-green-700 mt-0.5">Offseason discount applied</p>
+                    <div class="mt-2 flex items-center gap-2">
+                      <span class="text-xs text-green-600 line-through" id="originalPriceLower">₹0</span>
+                      <span class="text-sm font-bold text-green-700">→</span>
+                      <span class="text-sm font-bold text-green-700" id="newPriceLower">₹0</span>
+                      <span class="text-xs font-medium text-green-600 bg-green-100 px-1.5 py-0.5 rounded" id="percentLower">-0%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- No Dynamic Pricing (Regular Rate) -->
+              <div id="regularPriceBadge" class="hidden mb-3 p-2 bg-blue-50 rounded-lg border border-blue-100">
+                <div class="flex items-center gap-2 text-sm text-blue-800">
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                  </svg>
+                  <span>Regular rates apply</span>
+                </div>
+              </div>
+              
+              <div class="space-y-3 text-sm">
+                <div class="flex justify-between text-gray-600">
+                  <span>₹<span id="displayPrice"><%= (home.price || 0).toLocaleString('en-IN') %></span> × <span id="nightCount">1</span> night<span id="nightPlural"></span></span>
+                  <span id="subtotal">₹<%= (home.price || 0).toLocaleString('en-IN') %></span>
+                </div>
+                <div class="flex justify-between text-gray-600">
+                  <span>Cleaning fee</span>
+                  <span>₹500</span>
+                </div>
+                <div class="flex justify-between text-gray-600">
+                  <span>Service fee</span>
+                  <span id="serviceFee">₹<%= Math.round((home.price || 0) * 0.1).toLocaleString('en-IN') %></span>
+                </div>
+                <div class="border-t border-gray-200 pt-3 flex justify-between font-semibold text-gray-900">
+                  <span>Total</span>
+                  <span id="totalPrice">₹<%= ((home.price || 0) + 500 + Math.round((home.price || 0) * 0.1)).toLocaleString('en-IN') %></span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Rating -->
+            <div class="px-5 pb-5">
+              <div class="flex items-center gap-2 text-sm">
+                <svg class="w-4 h-4 text-rose-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                </svg>
+                <span class="font-semibold text-gray-900"><%= home.rating || 'N/A' %></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
 
     <script>
-      // Keep checkout >= checkin + 1 day on the client side as a UX nicety.
       const checkIn = document.getElementById('checkInDate');
       const checkOut = document.getElementById('checkOutDate');
+      const basePrice = Number(<%= JSON.stringify(home.price || 0) %>);
+      const listingId = '<%= home._id %>';
+      
+      // Keep checkout >= checkin + 1 day
       checkIn.addEventListener('change', () => {
         if (checkIn.value) {
           const next = new Date(checkIn.value);
@@ -69,7 +281,175 @@
             checkOut.value = checkOut.min;
           }
         }
+        updatePricing();
       });
+      
+      checkOut.addEventListener('change', updatePricing);
+      
+      async function updatePricing() {
+        if (checkIn.value && checkOut.value) {
+          const start = new Date(checkIn.value);
+          const end = new Date(checkOut.value);
+          const nights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+          
+          if (nights > 0) {
+            try {
+              // Call pricing API for dynamic pricing
+              const response = await fetch(`/api/pricing/calculate?listingId=${listingId}&checkIn=${checkIn.value}&checkOut=${checkOut.value}`);
+              const data = await response.json();
+              
+              const subtotal = data.totalPrice;
+              const avgPricePerNight = data.averagePricePerNight;
+              const serviceFee = Math.round(subtotal * 0.1);
+              const total = subtotal + 500 + serviceFee;
+              
+              // Update display
+              document.getElementById('displayPrice').textContent = avgPricePerNight.toLocaleString('en-IN');
+              document.getElementById('nightCount').textContent = nights;
+              document.getElementById('nightPlural').textContent = nights > 1 ? 's' : '';
+              document.getElementById('subtotal').textContent = '₹' + subtotal.toLocaleString('en-IN');
+              document.getElementById('serviceFee').textContent = '₹' + serviceFee.toLocaleString('en-IN');
+              document.getElementById('totalPrice').textContent = '₹' + total.toLocaleString('en-IN');
+              
+              // Show dynamic pricing badge if rules are applied
+              const higherAlert = document.getElementById('higherPriceAlert');
+              const lowerAlert = document.getElementById('lowerPriceAlert');
+              const regularBadge = document.getElementById('regularPriceBadge');
+              
+              // Hide all alerts first
+              higherAlert.classList.add('hidden');
+              lowerAlert.classList.add('hidden');
+              regularBadge.classList.add('hidden');
+              
+              if (data.appliedRules && data.appliedRules.length > 0) {
+                const ruleNames = data.appliedRules.map(r => r.name).join(', ');
+                const originalTotal = data.originalTotal;
+                const difference = data.totalPrice - originalTotal;
+                const percentChange = Math.round((difference / originalTotal) * 100);
+                
+                if (difference > 0) {
+                  // Price is HIGHER - show amber alert
+                  document.getElementById('higherPriceReason').textContent = ruleNames + ' - rates increased for these dates';
+                  document.getElementById('originalPriceHigher').textContent = '₹' + originalTotal.toLocaleString('en-IN');
+                  document.getElementById('newPriceHigher').textContent = '₹' + data.totalPrice.toLocaleString('en-IN');
+                  document.getElementById('percentHigher').textContent = '(+' + percentChange + '%)';
+                  higherAlert.classList.remove('hidden');
+                  // Show toast notification
+                  showToast('higher', ruleNames + ' (+' + percentChange + '%)');
+                } else if (difference < 0) {
+                  // Price is LOWER - show green alert
+                  const savings = Math.abs(difference);
+                  const savingsPercent = Math.abs(percentChange);
+                  document.getElementById('lowerPriceReason').textContent = ruleNames + ' - you save ₹' + savings.toLocaleString('en-IN') + '!';
+                  document.getElementById('originalPriceLower').textContent = '₹' + originalTotal.toLocaleString('en-IN');
+                  document.getElementById('newPriceLower').textContent = '₹' + data.totalPrice.toLocaleString('en-IN');
+                  document.getElementById('percentLower').textContent = '-' + savingsPercent + '%';
+                  lowerAlert.classList.remove('hidden');
+                  // Show toast notification
+                  showToast('lower', 'Save ' + savingsPercent + '% with ' + ruleNames);
+                }
+              } else {
+                // No dynamic pricing - show regular badge
+                regularBadge.classList.remove('hidden');
+              }
+            } catch (error) {
+              // Fallback to basic calculation if API fails
+              const subtotal = basePrice * nights;
+              const serviceFee = Math.round(subtotal * 0.1);
+              const total = subtotal + 500 + serviceFee;
+              
+              document.getElementById('displayPrice').textContent = basePrice.toLocaleString('en-IN');
+              document.getElementById('nightCount').textContent = nights;
+              document.getElementById('nightPlural').textContent = nights > 1 ? 's' : '';
+              document.getElementById('subtotal').textContent = '₹' + subtotal.toLocaleString('en-IN');
+              document.getElementById('serviceFee').textContent = '₹' + serviceFee.toLocaleString('en-IN');
+              document.getElementById('totalPrice').textContent = '₹' + total.toLocaleString('en-IN');
+              // Hide all pricing alerts on error
+              document.getElementById('higherPriceAlert').classList.add('hidden');
+              document.getElementById('lowerPriceAlert').classList.add('hidden');
+              document.getElementById('regularPriceBadge').classList.add('hidden');
+            }
+          }
+        }
+      }
+      
+      // Guest counter
+      const maxGuests = Number(<%= JSON.stringify(home.maxGuests || 4) %>);
+      let guestCount = 1;
+      const guestCountEl = document.getElementById('guestCount');
+      const guestsInput = document.getElementById('guestsInput');
+      const minusBtn = document.getElementById('guestMinus');
+      const plusBtn = document.getElementById('guestPlus');
+      
+      function updateGuestUI() {
+        guestCountEl.textContent = guestCount;
+        guestsInput.value = guestCount;
+        minusBtn.disabled = guestCount <= 1;
+        plusBtn.disabled = guestCount >= maxGuests;
+      }
+      
+      minusBtn.addEventListener('click', () => {
+        if (guestCount > 1) {
+          guestCount--;
+          updateGuestUI();
+        }
+      });
+      
+      plusBtn.addEventListener('click', () => {
+        if (guestCount < maxGuests) {
+          guestCount++;
+          updateGuestUI();
+        }
+      });
+      
+      // Toast notification functions
+      let toastTimeout;
+      
+      function showToast(type, message) {
+        const toast = document.getElementById('pricingToast');
+        const toastHigher = document.getElementById('toastHigher');
+        const toastLower = document.getElementById('toastLower');
+        
+        // Hide both toast types first
+        toastHigher.classList.add('hidden');
+        toastLower.classList.add('hidden');
+        
+        // Show appropriate toast
+        if (type === 'higher') {
+          document.getElementById('toastHigherText').textContent = message;
+          toastHigher.classList.remove('hidden');
+        } else if (type === 'lower') {
+          document.getElementById('toastLowerText').textContent = message;
+          toastLower.classList.remove('hidden');
+        }
+        
+        // Show toast container with animation
+        toast.classList.remove('hidden');
+        
+        // Trigger animation
+        setTimeout(() => {
+          toast.classList.remove('opacity-0', 'translate-y-[-20px]');
+          toast.classList.add('opacity-100', 'translate-y-0');
+        }, 10);
+        
+        // Auto-hide after 5 seconds
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => {
+          hideToast();
+        }, 5000);
+      }
+      
+      function hideToast() {
+        const toast = document.getElementById('pricingToast');
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'translate-y-[-20px]');
+        
+        setTimeout(() => {
+          toast.classList.add('hidden');
+        }, 300);
+      }
     </script>
+    
+    <%- include('../partials/footer') %>
   </body>
 </html>

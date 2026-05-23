@@ -36,13 +36,50 @@
         <!-- Price Breakdown -->
         <div class="border rounded-lg p-4 mb-6">
           <h4 class="font-semibold text-gray-800 mb-3">Price Details</h4>
+          
+          <% 
+            const nights = Math.ceil((booking.checkOutDate - booking.checkInDate) / (1000 * 60 * 60 * 24));
+            const originalPrice = booking.originalPrice || booking.totalPrice;
+            const priceDiff = booking.totalPrice - originalPrice;
+            const hasRules = booking.appliedPricingRules && booking.appliedPricingRules.length > 0;
+          %>
+          
+          <!-- Dynamic Pricing Alert -->
+          <% if (hasRules && priceDiff > 0) { %>
+            <div class="mb-3 p-2 bg-amber-50 rounded-lg border border-amber-100">
+              <div class="flex items-center gap-2 text-sm text-amber-800">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z" clip-rule="evenodd"/>
+                </svg>
+                <span><%= booking.appliedPricingRules.join(', ') %> Applied</span>
+              </div>
+            </div>
+          <% } else if (hasRules && priceDiff < 0) { %>
+            <div class="mb-3 p-2 bg-green-50 rounded-lg border border-green-100">
+              <div class="flex items-center gap-2 text-sm text-green-800">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <span><%= booking.appliedPricingRules.join(', ') %> - You save ₹<%= Math.abs(priceDiff).toLocaleString('en-IN') %>!</span>
+              </div>
+            </div>
+          <% } %>
+          
           <div class="flex justify-between mb-2">
-            <span class="text-gray-600">₹<%= home ? home.price : 0 %> x <%= Math.ceil((booking.checkOutDate - booking.checkInDate) / (1000 * 60 * 60 * 24)) %> nights</span>
-            <span class="font-medium">₹<%= booking.totalPrice %></span>
+            <span class="text-gray-600">₹<%= booking.pricePerNight || (home ? home.price : 0) %> × <%= nights %> nights</span>
+            <span class="font-medium">₹<%= booking.totalPrice.toLocaleString('en-IN') %></span>
           </div>
+          
+          <% if (hasRules && originalPrice !== booking.totalPrice) { %>
+            <div class="flex justify-between mb-2 text-sm">
+              <span class="text-gray-400">Original price</span>
+              <span class="text-gray-400 line-through">₹<%= originalPrice.toLocaleString('en-IN') %></span>
+            </div>
+          <% } %>
+          
           <div class="flex justify-between pt-3 border-t mt-3">
             <span class="text-lg font-bold">Total</span>
-            <span class="text-lg font-bold text-green-600">₹<%= booking.totalPrice %></span>
+            <span class="text-lg font-bold text-green-600">₹<%= booking.totalPrice.toLocaleString('en-IN') %></span>
           </div>
         </div>
         
@@ -70,11 +107,32 @@
           </form>
           
           <% if (booking.paymentStatus === 'pending') { %>
-            <button id="payBtn" class="flex-1 py-3 px-6 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition">
-              Pay ₹<%= booking.totalPrice %>
-            </button>
+            <% if (typeof isDemoMode !== 'undefined' && isDemoMode) { %>
+              <!-- Demo Mode Payment Button -->
+              <button id="demoPayBtn" class="flex-1 py-3 px-6 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition">
+                Complete Demo Payment ₹<%= booking.totalPrice %>
+              </button>
+            <% } else { %>
+              <!-- Real Razorpay Payment Button -->
+              <button id="payBtn" class="flex-1 py-3 px-6 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition">
+                Pay ₹<%= booking.totalPrice %>
+              </button>
+            <% } %>
           <% } %>
         </div>
+        
+        <% if (typeof isDemoMode !== 'undefined' && isDemoMode && booking.paymentStatus === 'pending') { %>
+          <!-- Demo Mode Notice -->
+          <div class="mt-4 bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg">
+            <p class="font-medium flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Demo Mode Active
+            </p>
+            <p class="text-sm mt-1">Razorpay credentials not configured. Click "Complete Demo Payment" to simulate a successful payment.</p>
+          </div>
+        <% } %>
         
         <!-- Payment Success Message (hidden initially) -->
         <div id="paymentSuccess" class="hidden mt-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg text-center">
@@ -92,11 +150,50 @@
     
     <script>
       const payBtn = document.getElementById('payBtn');
+      const demoPayBtn = document.getElementById('demoPayBtn');
       const bookingId = '<%= booking._id %>';
       const razorpayKeyId = '<%= razorpayKeyId %>';
       const userEmail = '<%= user ? user.email : "" %>';
       const userName = '<%= user ? (user.firstName + " " + (user.lastName || "")) : "" %>';
       
+      // Demo Payment Handler
+      if (demoPayBtn) {
+        demoPayBtn.addEventListener('click', async () => {
+          demoPayBtn.disabled = true;
+          demoPayBtn.textContent = 'Processing...';
+          
+          try {
+            const response = await fetch('/payment/demo', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ bookingId })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+              document.getElementById('paymentSuccess').classList.remove('hidden');
+              demoPayBtn.classList.add('hidden');
+              setTimeout(() => {
+                window.location.href = '/bookings/my?success=1';
+              }, 2000);
+            } else {
+              document.getElementById('paymentError').classList.remove('hidden');
+              document.getElementById('errorMessage').textContent = data.error || 'Demo payment failed';
+              demoPayBtn.disabled = false;
+              demoPayBtn.textContent = 'Retry Demo Payment';
+            }
+          } catch (error) {
+            console.error('Demo payment error:', error);
+            document.getElementById('paymentError').classList.remove('hidden');
+            document.getElementById('errorMessage').textContent = error.message;
+            demoPayBtn.disabled = false;
+            demoPayBtn.textContent = 'Retry Demo Payment';
+          }
+        });
+      }
+      
+      // Real Razorpay Payment Handler
       if (payBtn) {
         payBtn.addEventListener('click', async () => {
           payBtn.disabled = true;

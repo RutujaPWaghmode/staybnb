@@ -20,6 +20,9 @@ paymentRouter.post("/create-order", requireLogin, paymentController.createOrder)
 // POST verify payment after completion
 paymentRouter.post("/verify", requireLogin, paymentController.verifyPayment);
 
+// POST demo payment (for testing without Razorpay credentials)
+paymentRouter.post("/demo", requireLogin, paymentController.demoPayment);
+
 // POST cancel unpaid booking
 paymentRouter.post("/cancel/:bookingId", requireLogin, paymentController.cancelBooking);
 

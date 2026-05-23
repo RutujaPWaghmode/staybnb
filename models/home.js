@@ -17,7 +17,13 @@ const homeSchema = mongoose.Schema({
     type: Number,
     required: true,
   },
-  photo: String,
+  photo: {
+    type: String,
+    get: function(v) {
+      // Normalize path to forward slashes for cross-platform compatibility
+      return v ? v.replace(/\\/g, '/') : v;
+    }
+  },
   description: String,
   // New fields for search functionality
   maxGuests: {
@@ -45,6 +51,10 @@ const homeSchema = mongoose.Schema({
     default: [],
     // Common amenities: wifi, pool, parking, ac, kitchen, washer, tv, workspace
   },
+}, {
+  // Enable getters when converting to JSON/Object (for path normalization)
+  toJSON: { getters: true },
+  toObject: { getters: true },
 });
 
 // Create text index for location search
